@@ -79,7 +79,7 @@ The Gateway dials Kernel over HRPC (`@hyperswarm/rpc`) using the Kernel's listen
 1. `kernelKey`: hex string or Buffer. Pass `kernelKey: false` to run without a Kernel connection (useful when testing without a live Kernel;
 a plugin's own `mdkClient` still builds, but its calls fail per request with [`ERR_MDK_CLIENT_UNAVAILABLE`](../client/README.md#createmdkclientconfig-opts--auto-connecting-client)).
 2. `kernel`: an in-process `KernelManager` handle; the key comes from `kernel.getPublicKey()`.
-3. Key file: `keyFile` (default: `DEFAULT_KEY_FILE`, i.e. `os.tmpdir()/mdk/.kernel-key`), which `getKernel()` publishes on start.
+3. Key file: `keyFile` (default: `DEFAULT_KEY_FILE`, i.e. `~/.mdk/.kernel-key`), which `getKernel()` publishes on start.
 4. If none resolves, `startGateway()` throws `ERR_KERNEL_KEY_FILE_NOT_FOUND`.
 
 **Zero-config (same host, default)**: Start the Kernel with `getKernel()`, then `startGateway()` with no endpoint options: the
@@ -99,19 +99,21 @@ Note the resolution happens in `startGateway()`, not in the worker: the Gateway 
 `ctx.kernelKey` explicitly. The worker itself never dials Kernel; it only hands the resolved key to each plugin's context. If the
 HRPC connect fails, that plugin's own client fails its calls with `ERR_MDK_CLIENT_UNAVAILABLE` instead of crashing the HTTP server.
 
-Pre v1.0, Kernel's allowlist, `auth.whitelist` defaults to empty (any HRPC caller is admitted). When an allowlist is configured, the [Gateway's persistent DHT
-public key must be added before the connection is accepted](../kernel/README.md#transports); it stays stable across restarts.
+Pre v1.0, Kernel's [`auth.whitelist`](../kernel/README.md#transports) defaults to empty (any HRPC caller is admitted). When an allowlist is
+configured, add the Gateway's DHT public key before the connection is accepted. That key is `status.rpcClientKey` in the Gateway's
+[status file](../../../docs/concepts/control-plane.md#transport-identity-and-admission); every plugin's client dials with it, and it survives
+restarts. To admit the Gateway to a production Kernel, follow
+[Step 2 of the security blueprint](../../../docs/guides/security/index.md#step-2-admit-the-gateway-to-kernel).
 
 ## Security model
 
 - **No built-in user authentication**: the Gateway serves the routes its plugins declare to any caller. Validating callers is work each controller
   does for itself, using an identity layer you supply
   ([auth and permissions](../../../docs/guides/gateway/plugins.md#auth-and-permissions))
-- **Kernel connection security**: the HRPC connection is an encrypted Noise channel. Kernel maintains an HRPC firewall; when
-  `auth.whitelist` is configured, the Gateway's persistent DHT public key must be in Kernel's `auth.whitelist` (pre v1.0 the default is an
-  empty allowlist, so any caller is admitted).
-  See [Kernel Transport](../kernel/README.md#transports) and the [`auth-whitelist` example](../../../examples/backend/kernel/auth-whitelist.js)
-  for the key exchange pattern
+- **Kernel connection security**: the HRPC connection is an encrypted Noise channel, and Kernel runs an HRPC firewall that admits callers by its `auth.whitelist`. The
+  [Kernel connection](#kernel-connection) section covers the `status.rpcClientKey` to allowlist; the
+  [`auth-whitelist` example](../../../examples/backend/kernel/auth-whitelist.js) shows the key exchange, and
+  [Kernel Transport](../kernel/README.md#transports) the mechanism
 - Once connected, Kernel trusts all messages from the Gateway implicitly, apart from the device-family write permissions it requires in the
   `authPerms` array accompanying each write action
 - Human and AI callers reach the same routes on the same terms, since the Gateway distinguishes neither
@@ -196,6 +198,7 @@ gateway/
 ## Next steps
 
 - [Run the Gateway](../../../docs/guides/gateway/run.md)
+- [Secure the site](../../../docs/guides/security/index.md): admit this Gateway to Kernel and lock down the fleet
 - [Add routes with the plugin system](../../../docs/guides/gateway/plugins.md)
 - Browse the [supported plugins reference](../../../docs/reference/supported-plugins.md)
 - See a complete [worked example](../../../examples/full-site/README.md)

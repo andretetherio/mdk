@@ -7,7 +7,7 @@ Safety-status card for a MicroBT container showing smoke detector, water-ingress
 
 | Prop | Status | Type / Options | Default | Description |
 |------|--------|----------------|---------|-------------|
-| `data` | Optional | `{ smokeDetector: string \| number; waterIngressDetector: string \| number; coolingFanStatus: string \| number; }` | - | Device data |
+| `data` | Optional | `{ smokeDetector: string \| number; waterIngressDetector: string \| number; coolingFanStatus: string \| number }` | - | Device data |
 <!-- END GENERATED: props -->
 
 ## Minimal example

@@ -91,7 +91,7 @@ export function buildCatalog (root, manifestPaths) {
   return { entries, errors }
 }
 
-const cell = (value) => String(value).replace(/\|/g, '\\|').trimEnd().replace(/\.$/, '')
+const cell = (value) => String(value).replace(/[\\|]/g, '\\$&').trimEnd().replace(/\.$/, '')
 
 export function render (entries) {
   const links = []

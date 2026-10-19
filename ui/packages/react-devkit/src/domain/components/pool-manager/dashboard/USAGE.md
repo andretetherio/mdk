@@ -13,6 +13,12 @@ blocks, and a compact recent-alerts list.
 | `alerts` | Optional | `Alert[]` | `[]` | Recent alerts list (capped to `MAX_ALERTS_DISPLAYED`) |
 | `isStatsLoading` | Optional | `boolean` | `false` | Hide stats while loading |
 | `stats` | Optional | `DashboardStats` | - | Top-of-page stat blocks; hidden while loading |
+
+### `DashboardStats`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `items` | Required | `StatItem[]` | - | One stat block each, in order: `label` (also the React key), `value`, optional `/ secondaryValue` and an `ERROR`/`SUCCESS` status dot |
 <!-- END GENERATED: props -->
 
 ## Minimal example

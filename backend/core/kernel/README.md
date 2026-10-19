@@ -11,7 +11,7 @@ The Kernel discovers and registers Workers, dispatches commands through a crash-
 The Kernel is **pull-only and passive** — it never pushes to your app, and it never receives unsolicited MDK Protocol data from a
 Worker (the one inbound exception is the public key a Worker offers once on the discovery swarm connection). It always
 initiates, on the cadences set in `opts.cadences`, which is what keeps it from being overwhelmed by upstream pressure and why Workers
-are described as passive. Callers connect over HRPC using the Kernel's public key (published to `<tmpdir>/mdk/.kernel-key` on start).
+are described as passive. Callers connect over HRPC using the Kernel's public key (published to `~/.mdk/.kernel-key` on start).
 For telemetry, the scheduler fans `telemetry.pull` out to ready Workers; on-demand queries route to the owning Worker for a specific
 device. Callers do send command requests to Kernel, but Kernel then dispatches each one to the owning Worker via its own initiated call.
 
@@ -236,19 +236,27 @@ The only client transport: encrypted Noise connections over the Hyperswarm DHT, 
 How the caller obtains that key depends on where it runs:
 
 - **Same host (zero-config default)**: `getKernel()` writes Kernel's HRPC public key as hex to a well-known key file
-  (`<tmpdir>/mdk/.kernel-key`) after start, and the caller reads it from there automatically. The file is not deleted on
+  (`~/.mdk/.kernel-key`) after start, and the caller reads it from there automatically. The file is not deleted on
   shutdown, and the key stays stable across restarts because the RPC seed is persisted in Kernel's conf store rather than
   regenerated. Override the path with `opts.keyFile`, or pass `keyFile: false` to disable publishing
 - **Remote or multi-host**: share the key from `kernel.getPublicKey()` with the caller out-of-band
 
-Admission is controlled by an allowlist of hex public keys. An empty allowlist admits any HRPC caller, so a configured
-allowlist is what restricts connections to approved callers:
+Admission is controlled by an allowlist of hex public keys. An empty allowlist admits any HRPC caller; a configured allowlist
+restricts to approved callers:
 
 ```js
 createKernel({
   auth: { whitelist: ['<gateway-pubkey-hex>', '<mcp-pubkey-hex>'] }
 })
 ```
+
+The Gateway publishes the key it dials with as `status.rpcClientKey` in its status file; it is derived from a seed persisted in the
+Gateway store, so one allowlist entry survives Gateway restarts.
+
+> [!NOTE]
+> The [`auth-whitelist` example](../../../examples/backend/kernel/auth-whitelist.js) shows the two-run key exchange, and
+> [Step 2 of the security blueprint](../../../docs/guides/security/index.md#step-2-admit-the-gateway-to-kernel) covers admitting the Gateway in
+> production.
 
 This is a transport-level check on which backend processes may connect. It says nothing about the person or agent behind a
 request — see [control plane](../../../docs/concepts/control-plane.md#transport-identity-and-admission) for that distinction.
@@ -427,6 +435,7 @@ kernel/
 ## Next steps
 
 - [Start Kernel and wire it to the Gateway](../../../docs/guides/gateway/run.md)
+- [Secure the site](../../../docs/guides/security/index.md): the allowlist in production, end to end
 - Understand [which layer owns what, and how a request reaches a device](../../../docs/concepts/control-plane.md)
 - Learn how [Workers register devices and expose capabilities](../../workers/README.md), and how [Kernel discovers them](../../workers/docs/architecture.md#discovery-model)
 - See the [write-action approval flow (UI → Gateway → Kernel)](../../../docs/guides/gateway/write-actions.md)

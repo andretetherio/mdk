@@ -4,7 +4,9 @@ import { DEVICE_STATUS } from '../../../../../../../constants/devices'
 import './pump-box.scss'
 
 export type PumpItem = {
+  /** Running state: `true` shows a green Running indicator, `false` a gray Off one; when not a boolean the box renders nothing */
   enabled?: boolean
+  /** 0-based pump index, shown as `index + 1` in the title */
   index: number
 }
 

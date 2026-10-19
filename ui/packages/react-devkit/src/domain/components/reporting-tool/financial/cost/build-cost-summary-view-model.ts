@@ -30,27 +30,40 @@ export type CostSummaryMetric = {
 }
 
 export type CostSummaryDisplayMetrics = {
+  /** All-in cost per MWh for the range (API `avgAllInCostPerMWh`); the highlighted first tile */
   allInCost: CostSummaryMetric
+  /** Energy cost per MWh for the range (API `avgEnergyCostPerMWh`) */
   energyCost: CostSummaryMetric
+  /** Operational cost per MWh, derived as `totalOperationalCostsUSD / totalConsumptionMWh`; `value` is `null` when consumption is zero */
   operationsCost: CostSummaryMetric
 }
 
 export type CostTimeSeriesEntry = {
+  /** Period timestamp (ms epoch); formatted as the bucket's x-axis label for the selected period; joined with `btcPriceLog` entries on this value */
   ts: number
+  /** Total (energy + operational) cost for the period, in USD; drawn as the Production Cost bar */
   totalCostUSD: number
+  /** Energy cost for the period, in USD */
   energyCostUSD: number
+  /** Operational (non-energy) cost for the period, in USD */
   operationalCostUSD: number
 }
 
 export type BtcPriceTimeSeriesEntry = {
+  /** Period timestamp (ms epoch); must match the `costLog` entry it pairs with */
   ts: number
+  /** BTC price for the period, in USD; drawn as the BTC Price bar (0 when the period has no entry) */
   priceUSD: number
 }
 
 export type CostSummaryMonetaryTotals = {
+  /** Energy cost summed over the range, in USD; the Energy slice of the doughnut (omitted when 0) */
   totalEnergyCostsUSD: number
+  /** Operational cost summed over the range, in USD; the Operations slice of the doughnut (omitted when 0) */
   totalOperationalCostsUSD: number
+  /** Energy plus operational cost summed over the range, in USD */
   totalCostsUSD: number
+  /** Energy consumed over the range, in MWh */
   totalConsumptionMWh: number
 }
 

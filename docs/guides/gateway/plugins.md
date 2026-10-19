@@ -150,7 +150,7 @@ controller reference][plugins-readme-controllers] shows a controller building it
 
 | Field | Type | Contains |
 | --- | --- | --- |
-| `config` | `object` | The Gateway's runtime config, with `kernelKey`/`kernelBootstrap` folded in, and this plugin's own per-plugin config layered over the top key-by-key |
+| `config` | `object` | The Gateway's runtime config, with `kernelKey`/[`kernelKeyPair`][control-plane-admission]/`kernelBootstrap` folded in, and this plugin's own per-plugin config layered over the top key-by-key |
 | `logger` | `object` | A `child()` of the Gateway's own logger, tagged with this plugin's name — its lines interleave with the Gateway's own on stdout, ordered and formatted the same |
 | `onReady` | `function` | Registers a callback that runs once this Gateway is serving. Errors thrown inside it are [caught and logged as a warning, not fatal][plugins-readme-runtime-errors] |
 
@@ -282,8 +282,19 @@ The plugin loader validates every manifest and handler at startup and throws if 
   [`mdkClient`][client-readme-methods] reads and [`sendCommand`][client-readme-methods] dispatches
 - See the full [manifest and controller reference][plugins-readme]
 - Review the [Gateway API and config][gateway-readme]
+- Follow [how a request travels and who Kernel admits][control-plane]
+- Secure the site with the [security blueprint][security-blueprint]
 
 ## Links
+
+[control-plane]: ../../concepts/control-plane.md
+<!-- docs@tether.io: control-plane → concepts/control-plane -->
+
+[control-plane-admission]: ../../concepts/control-plane.md#transport-identity-and-admission
+<!-- docs@tether.io: control-plane-admission → concepts/control-plane#transport-identity-and-admission -->
+
+[security-blueprint]: ../security/index.md
+<!-- docs@tether.io: security-blueprint → guides/security -->
 
 [telemetry-client]: ../../../backend/core/plugins/telemetry/lib/client.js
 <!-- docs@tether.io: telemetry-client → https://github.com/tetherto/mdk/blob/main/backend/core/plugins/telemetry/lib/client.js -->

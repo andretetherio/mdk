@@ -1,6 +1,6 @@
 # MDK
 
-[![Release](https://img.shields.io/github/v/release/tetherto/mdk?display_name=tag&style=flat-square)](https://github.com/tetherto/mdk/releases/tag/v0.10.0)
+[![Release](https://img.shields.io/github/v/release/tetherto/mdk?display_name=tag&style=flat-square)](https://github.com/tetherto/mdk/releases/tag/v0.11.0)
 [![CI](https://img.shields.io/github/actions/workflow/status/tetherto/mdk/ci.yml?branch=main&label=CI&style=flat-square&logo=github)](https://github.com/tetherto/mdk/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/tetherto/mdk/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/tetherto/mdk/actions/workflows/github-code-scanning/codeql)
 [![Documentation](https://img.shields.io/badge/docs-mdk.tether.io-2ea44f?style=flat-square)](https://docs.mdk.tether.io)
@@ -11,19 +11,19 @@
 
 MDK is under active development and is **not yet considered stable**.
 
-Current release [v0.10.0](https://github.com/tetherto/mdk/releases/tag/v0.10.0).
+Current release [v0.11.0](https://github.com/tetherto/mdk/releases/tag/v0.11.0).
 
 ## Table of contents
 
 - [Overview](#overview)
-- [Architecture](#architecture)
-- [Releases](#releases)
 - [Get Started](#get-started)
   - [Run the demo site](#run-the-demo-site)
 - [Build and develop](#build-and-develop)
 - [Documentation](#documentation)
 - [Support](#support)
 - [Contributing](#contributing)
+- [Architecture](#architecture)
+- [Releases](#releases)
 - [License](#license)
 - [Acknowledgments](#acknowledgments)
 
@@ -46,60 +46,6 @@ The monorepo is organized into three development domains:
 You drive MDK via the [Gateway](backend/core/gateway/README.md). The Gateway is where your business logic is defined
 and MDK can be extended. It's your Node.js server that connects to the Kernel to receive data from, and send
 instructions to, Workers.
-
-## Architecture
-
-[MDK](docs/concepts/architecture.md) uses device credentials to collect telemetry continuously, dispatch commands, and expose device state through the
-Kernel to agents,applications, dashboards, and automation services. At Layer 1, Workers translate vendor protocols for miners, power meters, sensors,
-facility platforms, and pool APIs into the MDK Protocol.
-
-Through the Gateway — and, for AI agents, the standalone MCP server — dashboards and custom solutions monitor device state and issue authorized control commands
-through a consistent API.
-
-That means that you can connect any physical hardware (e.g., miners, power meters, temperature sensors), facility management platforms
-(e.g., Antspace, Bitdeer), or pool APIs (e.g., OceanPool, F2Pool) by defining their Workers (at Layer 1), translating each source
-into the common MDK protocol. Furthermore, you have full control over configuring your deployments as [single-process, local multi-process, or
-distributed deployments](docs/concepts/deployment-topologies.md).
-
-```text
-Layer 4 — Browser UI          (Optional dashboard/app layer)
-        │  HTTP (polling)
-        ▼
-Layer 3 — Gateway            (Your Node.js server)
-        │  HRPC (@hyperswarm/rpc)
-        ▼
-Layer 2 — Kernel              (Orchestration Kernel)
-        │  MDK Protocol over HRPC
-        ▼
-Layer 1 — Workers             (Protocol translators)
-        │  HTTP + vendor auth
-        ▼
-Layer 0 — Data sources        (Hardware, external APIs, facility platforms)
-```
-
-### UI application layer
-
-MDK can run without a UI, but the UI toolkit is a first-class development surface for operator applications. It connects
-dashboards and control interfaces to the Gateway without requiring applications to implement the MDK Protocol or hardware
-integrations directly.
-
-- [`@tetherto/mdk-ui-foundation`](ui/packages/ui-foundation/README.md) provides framework-independent state, API contracts, and query helpers
-- [`@tetherto/mdk-react-adapter`](ui/packages/react-adapter/README.md) connects React applications to Gateway data and actions
-- [`@tetherto/mdk-react-devkit`](ui/packages/react-devkit/README.md) provides reusable UI primitives and mining-domain components
-
-Use the packages together for a complete operator dashboard. You may start from the
-[`mdk-ui-shell` template](examples/mdk-ui-shell-template/README.md), follow the
-[agent-oriented workflow](ui/docs/AGENT_FIRST.md), or directly compose the runtime packages
-in your own application structure.
-
-## Releases
-
-The latest development code is available on the [`main`](https://github.com/tetherto/mdk/tree/main) branch. MDK follows
-[Semantic Versioning 2.0.0](https://semver.org/): `0.y.z` versions are initial development (public API not stable until `1.0.0`); `1.0.0` and
-above denote a stable public API.
-
-Releases have notes [`docs/reference/release-notes/`](docs/reference/release-notes/) and the full version history is
-available as a [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Get started
 
@@ -176,7 +122,8 @@ MDK ships a backend SDK and an optional dashboarding layer. Find your lane:
 the [Gateway API surfaces](docs/guides/gateway/index.md)
 - **I'm an app developer building a dashboard end to end**: follow [build a dashboard](docs/tutorials/build-a-dashboard.md), or scaffold one against
 a running stack with [`mdk create dashboard`](packages/cli/README.md) (`@tetherto/mdk-cli`)
-- **I'm building with AI**: how does my agent work with MDK? Read the [agent entry points](docs/README.md#agent)
+- **I'm building with AI**: how does my agent work with MDK? Teach it MDK with [`mdk skill add`](docs/guides/ui/agent-skills.md), then read
+the [agent entry points](docs/README.md#agent)
 
 ### Agents
 
@@ -217,8 +164,7 @@ to tear down the UI's build artifacts and installed dependencies; most backend a
 
 ### Examples
 
-Four example trees ship with the repo. All four are maintained — none is deprecated — but they answer different questions,
-so start from the one that matches what you are doing:
+The following example trees ship with the repo — they answer different questions, so start from the one that matches what you are doing:
 
 | Example                                               | Use it for                  | Status      |
 | ----------------------------------------------------- | --------------------------- | ----------- |
@@ -253,6 +199,60 @@ For support, raise a [GitHub Issue](https://github.com/tetherto/mdk/issues) or c
 Contributions are welcome. Follow the [contribution guide](CONTRIBUTING.md) for setup, branch conventions, testing, and pull-request requirements.
 
 For security vulnerability reporting, see the [Security policy](SECURITY.md).
+
+## Architecture
+
+[MDK](docs/concepts/architecture.md) uses device credentials to collect telemetry continuously, dispatch commands, and expose device state through the
+Kernel to agents, applications, dashboards, and automation services. At Layer 1, Workers translate vendor protocols for miners, power meters, sensors,
+facility platforms, and pool APIs into the MDK Protocol.
+
+Through the Gateway — and, for AI agents, the standalone MCP server — dashboards and custom solutions monitor device state and issue authorized control commands
+through a consistent API.
+
+That means that you can connect any physical hardware (e.g., miners, power meters, temperature sensors), facility management platforms
+(e.g., Antspace, Bitdeer), or pool APIs (e.g., OceanPool, F2Pool) by defining their Workers (at Layer 1), translating each source
+into the common MDK protocol. Furthermore, you have full control over configuring your deployments as [single-process, local multi-process, or
+distributed deployments](docs/concepts/deployment-topologies.md).
+
+```text
+Layer 4 — Browser UI          (Optional dashboard/app layer)
+        │  HTTP (polling)
+        ▼
+Layer 3 — Gateway            (Your Node.js server)
+        │  HRPC (@hyperswarm/rpc)
+        ▼
+Layer 2 — Kernel              (Orchestration Kernel)
+        │  MDK Protocol over HRPC
+        ▼
+Layer 1 — Workers             (Protocol translators)
+        │  HTTP + vendor auth
+        ▼
+Layer 0 — Data sources        (Hardware, external APIs, facility platforms)
+```
+
+### UI application layer
+
+MDK can run without a UI, but the UI toolkit is a first-class development surface for operator applications. It connects
+dashboards and control interfaces to the Gateway without requiring applications to implement the MDK Protocol or hardware
+integrations directly.
+
+- [`@tetherto/mdk-ui-foundation`](ui/packages/ui-foundation/README.md) provides framework-independent state, API contracts, and query helpers
+- [`@tetherto/mdk-react-adapter`](ui/packages/react-adapter/README.md) connects React applications to Gateway data and actions
+- [`@tetherto/mdk-react-devkit`](ui/packages/react-devkit/README.md) provides reusable UI primitives and mining-domain components
+
+Use the packages together for a complete operator dashboard. You may start from the
+[`mdk-ui-shell` template](examples/mdk-ui-shell-template/README.md), follow the
+[agent-oriented workflow](ui/docs/AGENT_FIRST.md), or directly compose the runtime packages
+in your own application structure.
+
+## Releases
+
+The latest development code is available on the [`main`](https://github.com/tetherto/mdk/tree/main) branch. MDK follows
+[Semantic Versioning 2.0.0](https://semver.org/): `0.y.z` versions are initial development (public API not stable until `1.0.0`); `1.0.0` and
+above denote a stable public API.
+
+Releases have notes [`docs/reference/release-notes/`](docs/reference/release-notes/) and the full version history is
+available as a [`CHANGELOG.md`](CHANGELOG.md).
 
 ## License
 

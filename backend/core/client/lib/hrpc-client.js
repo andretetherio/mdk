@@ -13,7 +13,9 @@ const { serialize, deserialize } = require('../../kernel/lib/protocol/envelope')
  * queue is needed: concurrent requests are multiplexed by the RPC layer.
  *
  * `key` is the Kernel listener public key (hex string or Buffer) obtained from
- * `kernel.getPublicKey()`. A `dht`/`rpc` may be injected (tests) to share an
+ * `kernel.getPublicKey()`. `keyPair` (or a function returning one), or `seed`,
+ * pins the DHT identity this client dials with, so the Kernel allowlist can
+ * name it. A `dht`/`rpc` may be injected (tests) to share an
  * existing transport; otherwise this client owns and tears down its own.
  */
 class HRPCClient {
@@ -22,6 +24,7 @@ class HRPCClient {
 
     this._key = Buffer.isBuffer(opts.key) ? opts.key : Buffer.from(opts.key, 'hex')
     this._seed = opts.seed || null
+    this._keyPair = opts.keyPair || null
     this._bootstrap = opts.bootstrap || null
     this._dht = opts.dht || null
     this._rpc = opts.rpc || null
@@ -29,17 +32,18 @@ class HRPCClient {
     this._connected = false
   }
 
-  connect () {
+  async connect () {
     if (!this._rpc) {
       const dhtOpts = {}
-      if (this._seed) dhtOpts.keyPair = DHT.keyPair(this._seed)
+      const keyPair = typeof this._keyPair === 'function' ? await this._keyPair() : this._keyPair
+      if (keyPair) dhtOpts.keyPair = keyPair
+      else if (this._seed) dhtOpts.keyPair = DHT.keyPair(this._seed)
       if (this._bootstrap) dhtOpts.bootstrap = this._bootstrap
       this._dht = new DHT(dhtOpts)
       this._rpc = new HyperswarmRPC({ dht: this._dht })
     }
     this._connected = true
     debug('connected to kernel %s...', this._key.toString('hex').slice(0, 16))
-    return Promise.resolve()
   }
 
   async close () {

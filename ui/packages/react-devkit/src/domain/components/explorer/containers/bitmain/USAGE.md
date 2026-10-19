@@ -20,13 +20,13 @@ Components for the Bitmain hydro-cooled container explorer view.
 
 ## Props detail
 
-> **Props are generated from this component's TypeScript types, the source of truth.** The following are supplementary (object-prop shapes, allowed values, or passthrough props), not the full prop list.
+> **Props and the object shapes they reference are generated from this component's TypeScript types, the source of truth.** The following is supplementary (sub-component props, allowed values, `ref` methods, or passthrough props), not the full prop list.
 
 **BitMainHydroSettings / BitMainBasicSettings / BitMainCoolingSystem / BitMainPowerAndPositioning**
 
 **StatusItem**
 
-| Prop | Status | Type | Default | Description |
+| Prop | Status | Type / Options | Default | Description |
 | --- | --- | --- | --- | --- |
 | `label` | Optional | `string` | — | Display label for the status |
 | `status` | Optional | `StatusType` | — | Status value that drives the color indicator |

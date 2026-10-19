@@ -21,6 +21,16 @@ pre-shaped for this component.
 | `onShowDetails` | Optional | `(row: MiningPoolRow) => void` | - | Called when the user clicks the per-row "Show details" button |
 | `rows` | Optional | `MiningPoolRow[]` | `[]` | Pool rows, in display order |
 | `skeletonRows` | Optional | `number` | `3` | Number of skeleton rows to show while loading |
+
+### `MiningPoolRow`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `id` | Required | `string` | - | Stable React key |
+| `name` | Required | `string` | - | Display name (e.g. `minerpool-f2pool-shelf-0`) |
+| `details` | Optional | `PoolDetailItem[]` | - | Key/value details rendered inside the "Show details" popover |
+| `hashratePhs` | Optional | `number` | - | Hashrate in PH/s — used for display (TH/s shown automatically below 1 PH/s) |
+| `revenue24hBtc` | Optional | `number` | - | 24h revenue in BTC; rendered as `0.00 BTC` when undefined |
 <!-- END GENERATED: props -->
 
 ## Minimal example

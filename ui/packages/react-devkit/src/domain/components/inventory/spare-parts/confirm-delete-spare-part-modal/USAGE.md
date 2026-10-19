@@ -13,6 +13,13 @@ part code so the user can verify before confirming.
 | `onClose` | Optional | `VoidFunction` | - | Called when the modal requests to close |
 | `onConfirm` | Optional | `((sparePart: ConfirmDeleteSparePartModalSparePart) => void \| Promise<void>)` | - | Called with the part when the user confirms |
 | `sparePart` | Optional | `ConfirmDeleteSparePartModalSparePart` | - | The part to delete; when omitted the modal renders nothing |
+
+### `ConfirmDeleteSparePartModalSparePart`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `code` | Required | `string` | - | Part code, quoted in the confirmation message |
+| `id` | Required | `string` | - | Part identifier; not rendered, passed back to `onConfirm` with the part |
 <!-- END GENERATED: props -->
 
 ## When to use

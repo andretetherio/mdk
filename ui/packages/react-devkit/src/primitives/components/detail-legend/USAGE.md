@@ -10,22 +10,18 @@ An enhanced chart legend that displays color swatches, current values, units, an
 | `items` | Required | `DetailLegendItem[]` | - | Legend items to display |
 | `className` | Optional | `string` | - | Custom class name |
 | `onToggle` | Optional | `((label: string, index: number) => void)` | - | Callback when a legend item is toggled |
-<!-- END GENERATED: props -->
-
-## Props detail
-
-> **Props are generated from this component's TypeScript types, the source of truth.** The following are supplementary (object-prop shapes, allowed values, or passthrough props), not the full prop list.
 
 ### `DetailLegendItem`
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `label` | `string` | yes | Display label |
-| `color` | `string` | yes | Color for the swatch (hex, css color) |
-| `icon` | `React.ReactNode` | no | Custom icon replacing the default color box |
-| `currentValue` | `{ value: number \| string; unit?: string }` | no | Current value displayed below the label |
-| `percentChange` | `number \| null` | no | Percentage change; positive shows ▲ green, negative shows ▼ red |
-| `hidden` | `boolean` | no | Dims the item to indicate a hidden dataset |
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `color` | Required | `string` | - | Hex color for the default swatch (border, plus 20% opacity fill) and the `color` of a custom `icon` |
+| `label` | Required | `string` | - | Display label; also passed to `onToggle` |
+| `currentValue` | Optional | `{ value: string \| number; unit?: string }` | - | Value shown below the label, numbers formatted, with optional `unit`; also the row that holds `percentChange` |
+| `hidden` | Optional | `boolean` | - | Dims the item (30% opacity) to show its dataset is hidden |
+| `icon` | Optional | `React.ReactNode` | - | Custom icon replacing the default color swatch |
+| `percentChange` | Optional | `number \| null` | - | Percentage change shown after `currentValue`: positive as a green ▲, negative as a red ▼; hidden when `0`, `null` or without `currentValue` |
+<!-- END GENERATED: props -->
 
 ## Example
 

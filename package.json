@@ -1,6 +1,6 @@
 {
   "name": "@tetherto/mdk",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "private": true,
   "description": "MDK umbrella repository - root orchestrator. Every publishable backend package (backend/core/*, backend/plugins/*, backend/workers/**, backend/tests/*), the standalone packages/* tools, and examples/{backend,full-site,mvp-site} are members of the root npm workspace below, so a single root install hoists and links them all. The UI toolkit (ui/) stays a separate Turborepo-driven workspace with its own lockfile; root scripts forward to it by prefix.",
   "license": "Apache-2.0",
@@ -39,7 +39,8 @@
     "ip-address": ">=10.3.1",
     "undici": ">=6.24.0",
     "qs": "6.16.0",
-    "smol-toml": "1.8.0"
+    "smol-toml": "1.9.0",
+    "proxy-addr": "2.0.8"
   },
   "scripts": {
     "setup": "npm run setup:ui && npm install",

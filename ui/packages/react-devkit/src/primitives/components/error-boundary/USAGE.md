@@ -6,7 +6,7 @@ A React class component that catches rendering errors in its subtree and display
 
 ### `ErrorBoundary`
 
-| Prop            | Status   | Type              | Default | Description                                                          |
+| Prop            | Status   | Type / Options | Default | Description                                                          |
 | --------------- | -------- | ----------------- | ------- | -------------------------------------------------------------------- |
 | `children`      | Required | `React.ReactNode` | —       | Subtree to protect                                                   |
 | `fallback`      | Optional | `React.ReactNode` | —       | Custom UI to render when an error is caught. If omitted, a default error panel with an expandable stack trace is shown. |

@@ -1,10 +1,15 @@
 import type { CSSProperties } from 'react'
 
 export type LogData = {
+  /** Unique identifier */
   uuid: string
+  /** Body text; `|`-separated values are split into separate lines */
   body: string
+  /** Primary text */
   title: string
+  /** Severity / status string (`'Critical'`, `'High'`, `'Medium'`, activity status, etc.) */
   status: string
+  /** Secondary text (truncated with `title` tooltip) */
   subtitle: string
 }
 
@@ -20,9 +25,13 @@ export type LogRowProps = {
 }
 
 export type LogPagination = {
+  /** Current page number */
   current: number
+  /** Total number of items */
   total: number
+  /** Items per page */
   pageSize: number
+  /** Fired when the user changes the page */
   handlePaginationChange: (page: number) => void
 }
 

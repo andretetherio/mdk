@@ -4,7 +4,7 @@ import { runToolLoop, describeCallError, deadline, UNSPEAKABLE_FALLBACK } from '
 import { DEFAULT_LIMITS, REQUEST_TIMEOUT_MS } from './constants.js'
 import { SESSION_GONE } from './session-store.js'
 import { EVENT } from './events.js'
-import { CHARTER } from './charter.js'
+import { CHARTER, charterVersionFor } from './charter.js'
 
 /**
  * One conversation. Turns each user message into a streamed sequence of typed events (see
@@ -18,7 +18,7 @@ import { CHARTER } from './charter.js'
  * session that kept its own uncapped array would grow past it while the store looked bounded.
  */
 export class Session {
-  constructor ({ provider, system, limits = {}, userId = 'local', tools = [], mcp = null, notCovered, store = null, id, messages = [] } = {}) {
+  constructor ({ provider, system, limits = {}, userId = 'local', tools = [], mcp = null, notCovered, charterVersion, strictToolGating = true, store = null, id, messages = [] } = {}) {
     if (!provider) throw new Error('Session needs a provider')
     this.provider = provider
     this.system = system ?? CHARTER
@@ -27,6 +27,10 @@ export class Session {
     this.tools = tools
     this.mcp = mcp
     this.notCovered = notCovered
+    // Which standing instruction this conversation ran under, and whether its tools passed strict
+    // gating — provenance the gateway stamps onto a run so a transcript keeps its meaning later.
+    this.charterVersion = charterVersion ?? charterVersionFor(this.system)
+    this.strictToolGating = strictToolGating
     this.store = store
     this.messages = messages
     this.id = id ?? randomUUID()
@@ -81,6 +85,7 @@ export class Session {
       tools: this.tools,
       mcp: this.mcp,
       notCovered: this.notCovered,
+      strictToolGating: this.strictToolGating,
       maxSteps: this.limits.maxSteps ?? DEFAULT_LIMITS.maxSteps,
       maxOutputTokens: this.limits.maxOutputTokens ?? DEFAULT_LIMITS.maxOutputTokens,
       requestTimeoutMs: this.limits.requestTimeoutMs ?? REQUEST_TIMEOUT_MS

@@ -3,8 +3,11 @@ import type { ReactElement } from 'react'
 import './miner-metric-card.scss'
 
 export type StatItem = {
+  /** In `primaryStats`, selects the slot and must be exactly 'Efficiency', 'Hash rate', 'Temperature', 'Frequency' or 'Consumption'; in `secondaryStats`, the label (and React key) */
   name?: string
+  /** Displayed value; Efficiency only shows when it is a number */
   value?: number | string
+  /** Unit appended after the value in `primaryStats`; ignored in `secondaryStats`, so fold it into `value` there */
   unit?: string
 }
 

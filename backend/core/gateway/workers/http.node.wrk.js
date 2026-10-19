@@ -135,7 +135,7 @@ class WrkServerHttp extends TetherWrkBase {
 
         await httpd.startServer()
 
-        // rpc client key to be allowed through destination server firewall
+        // the DHT key plugin clients dial the Kernel with (plugin-gateway kernelKeyPair): put it on Kernel's auth.whitelist
         this.status.rpcClientKey = this.net_r0.dht.defaultKeyPair.publicKey.toString('hex')
         this.saveStatus()
 

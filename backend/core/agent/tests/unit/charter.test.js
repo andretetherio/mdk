@@ -1,6 +1,6 @@
 import test from 'brittle'
 import { createHash } from 'node:crypto'
-import { CHARTER, CHARTER_VERSION } from '../../src/charter.js'
+import { CHARTER, CHARTER_VERSION, CHARTER_VERSION_CUSTOM, charterVersionFor } from '../../src/charter.js'
 import { Session } from '../../src/session.js'
 
 // The charter is the one string in this package whose exact bytes are the contract. It is sent
@@ -39,4 +39,16 @@ test('a session given no system prompt runs on the charter', (t) => {
 
 test('a caller may still supply its own', (t) => {
   t.is(new Session({ provider: {}, system: 'CHARTER' }).system, 'CHARTER')
+})
+
+test('charterVersionFor distinguishes standard charter from custom instructions', (t) => {
+  t.is(charterVersionFor(undefined), CHARTER_VERSION)
+  t.is(charterVersionFor(null), CHARTER_VERSION)
+  t.is(charterVersionFor(CHARTER), CHARTER_VERSION)
+  t.is(charterVersionFor('You are a custom assistant.'), CHARTER_VERSION_CUSTOM)
+})
+
+test('a session with custom system prompt defaults charterVersion to custom', (t) => {
+  t.is(new Session({ provider: {}, system: 'Custom system instructions.' }).charterVersion, CHARTER_VERSION_CUSTOM)
+  t.is(new Session({ provider: {} }).charterVersion, CHARTER_VERSION)
 })

@@ -12,7 +12,7 @@ const initialize = require('./utils/initialize')
 const { startServices } = require('./services')
 const { keysDir, discoverWorkerKeys } = require('./lib/local-discovery')
 
-const defaultRoot = path.join(os.tmpdir(), 'mdk')
+const defaultRoot = path.join(os.homedir(), '.mdk')
 
 // The gateway package, which startGateway boots and whose dependencies include
 // the bundled plugins — see bundledPluginDir.
@@ -27,7 +27,7 @@ const DEFAULT_TOPIC_FILE = path.join(defaultRoot, '.dht-topic')
 const DEFAULT_KEY_FILE = path.join(defaultRoot, '.kernel-key')
 
 function _ensureDirs (...dirs) {
-  for (const d of dirs) fs.mkdirSync(d, { recursive: true })
+  for (const d of dirs) fs.mkdirSync(d, { recursive: true, mode: 0o700 })
 }
 
 // Publish the Kernel HRPC public key to a well-known file so out-of-process
@@ -154,7 +154,7 @@ function bundledPluginDir (name) {
  * connect without any configuration.
  *
  * @param {object} [opts]
- * @param {string} [opts.root]        - Data root dir (default: os.tmpdir()/mdk)
+ * @param {string} [opts.root]        - Data root dir (default: ~/.mdk)
  * @param {string} [opts.storeDir]    - Override store dir
  * @param {string} [opts.topic]       - DHT topic hex (default: read from topicFile)
  * @param {string} [opts.topicFile]   - Path to topic file (default: DEFAULT_TOPIC_FILE)
@@ -238,7 +238,7 @@ async function startKernel (opts = {}) {
  * fallbacks, consistent with the rest of the MDK architecture.
  *
  * @param {object}  [opts]
- * @param {string}  [opts.root]          - Config/data root dir (default: os.tmpdir()/mdk/gateway)
+ * @param {string}  [opts.root]          - Config/data root dir (default: ~/.mdk/gateway)
  * @param {number}  [opts.port]          - HTTP port (default: 3000)
  * @param {string}  [opts.env]           - Environment string (default: 'development')
  * @param {string}  [opts.tmpdir]        - Isolate the corestore under this dir instead of a

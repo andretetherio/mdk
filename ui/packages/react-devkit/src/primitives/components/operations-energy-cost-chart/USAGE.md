@@ -9,7 +9,7 @@ Doughnut chart comparing Operations and Energy cost ($/MWh). Includes
 | Prop | Status | Type / Options | Default | Description |
 |------|--------|----------------|---------|-------------|
 | `className` | Optional | `string` | - | Extra class on the container |
-| `data` | Optional | `Partial<{ energyCostsUSD: number; operationalCostsUSD: number; }>` | - | `operationalCostsUSD` and `energyCostsUSD` |
+| `data` | Optional | `Partial<{ energyCostsUSD: number; operationalCostsUSD: number }>` | - | `operationalCostsUSD` and `energyCostsUSD` |
 | `emptyMessage` | Optional | `string` | - | Message when both costs are zero or missing |
 | `height` | Optional | `number` | `200` | Doughnut height in pixels |
 | `isLoading` | Optional | `boolean` | `false` | Shows loading overlay on the chart area |

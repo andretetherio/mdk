@@ -25,6 +25,7 @@ The monorepo is organized into three development domains:
 - [New here — what is this?](#new-here)
 - [Agent](#agent)
 - [Engineer](#engineer)
+- [Manufacturer](#manufacturer)
 - [Docs maintainer](#docs-maintainer)
 
 ### New here
@@ -51,7 +52,7 @@ You are an LLM consuming MDK at runtime.
 | UI component registry (machine-readable) | `ui/<pkg>/dist/registry.json` (when shipping) |
 | Per-workspace agent-ready entry points | [`../backend/workers/docs/AGENT_READY.md`](../backend/workers/docs/AGENT_READY.md), [`../backend/core/docs/AGENT_READY.md`](../backend/core/docs/AGENT_READY.md), [`../ui/AGENTS.md`](../ui/AGENTS.md) |
 | Connect an AI agent to MDK over MCP | [`../backend/core/mcp/README.md`](../backend/core/mcp/README.md) |
-| Install Agent Skills for your coding agent (Cursor, Claude Code) | [`../packages/mdk-skill/README.md`](../packages/mdk-skill/README.md) |
+| Install Agent Skills for your coding agent (Cursor, Claude Code): `mdk skill add` | [`guides/ui/agent-skills.md`](guides/ui/agent-skills.md), [`../packages/mdk-skill/README.md`](../packages/mdk-skill/README.md) |
 
 ### Engineer
 
@@ -106,6 +107,17 @@ scripts, and Gateway extensions. Your starting point depends on which you're bui
 | Run a container Worker | [`guides/containers/`](guides/containers/index.md) |
 | MDK Protocol envelope, action catalogue, and command targeting | [`reference/protocol/messages.md`](reference/protocol/messages.md) |
 | Kernel's internal modules (Dispatcher, CSM, Registry, and more) | [`reference/kernel/modules.md`](reference/kernel/modules.md) |
+
+### Manufacturer
+
+You make the hardware, firmware, or data feed, and want it to speak MDK by shipping a Worker package from your own
+public or private repository. MDK never forks or vendors your source: it reads your `mdk-contract.json`. To appear in the hardware catalogue, add a registry entry, or share the contract source in [an issue](https://github.com/tetherto/mdk/issues).
+
+| Topic | Where |
+| --- | --- |
+| Build a Worker for your device, firmware, or data feed | [`guides/workers/build-a-worker.md`](guides/workers/build-a-worker.md) |
+| Test your Worker against a live Kernel before you ship | [`guides/workers/test-a-worker.md`](guides/workers/test-a-worker.md) |
+| Get your Worker listed in the hardware catalogue | [raise an issue](https://github.com/tetherto/mdk/issues), or add a row to [`external-workers.json`](../backend/workers/external-workers.json) |
 
 ### Docs maintainer
 

@@ -82,8 +82,8 @@ function canonicalFingerprint (tool, args) {
  * plain-text answer; tool calls run against the MCP server and their result is fed back,
  * until an answer arrives or maxSteps is reached.
  */
-export async function * runToolLoop ({ model, system, messages, tools, mcp, notCovered, maxSteps = DEFAULT_LIMITS.maxSteps, maxOutputTokens = DEFAULT_LIMITS.maxOutputTokens, requestTimeoutMs = REQUEST_TIMEOUT_MS }) {
-  const toolSystem = buildToolSystem(system, tools, { notCovered })
+export async function * runToolLoop ({ model, system, messages, tools, mcp, notCovered, strictToolGating = true, maxSteps = DEFAULT_LIMITS.maxSteps, maxOutputTokens = DEFAULT_LIMITS.maxOutputTokens, requestTimeoutMs = REQUEST_TIMEOUT_MS }) {
+  const toolSystem = buildToolSystem(system, tools, { notCovered, strictToolGating })
   const toolByName = new Map((tools ?? []).map((t) => [t.name, t])) // for readOnlyHint lookup
   const toolNames = [...toolByName.keys()].sort((a, b) => b.length - a.length)
   const convo = messages.map((m) => ({ ...m })) // working copy we can append tool turns to
@@ -350,15 +350,15 @@ function isOperatorProse (text, toolNames = []) {
     !leaksScaffolding(text)
 }
 
-export function buildToolSystem (system, tools, { notCovered } = {}) {
+export function buildToolSystem (system, tools, { notCovered, strictToolGating = true } = {}) {
   if (!tools || !tools.length) return system
-  const coverage = renderCoverage(tools, { notCovered })
+  const coverage = renderCoverage(tools, { notCovered, strictToolGating })
   return [
     system,
     '',
     'You can call tools to get live data about the mining fleet. Available tools:',
     '',
-    renderTools(tools),
+    renderTools(tools, { strictToolGating }),
     ...(coverage ? ['', coverage] : []),
     '',
     'To call a tool, reply with ONLY a JSON object and nothing else:',
@@ -574,8 +574,9 @@ export function rejectedArguments (text) {
  * works. (exported for tests)
  */
 export function contractViolation (tool, text) {
-  if (!agentMeta(tool)) return null
-  if (!RESULT[verbOf(tool.name)]) return null
+  const meta = agentMeta(tool)
+  if (!meta || meta.synthesized === true || meta.contractChecked !== true) return null
+  if (!Object.hasOwn(RESULT, verbOf(tool.name))) return null
 
   let payload
   try {

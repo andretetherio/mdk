@@ -33,9 +33,9 @@ composable parts for full control, or `SimplePopover` for the common case.
 
 ## `Popover` (root) Props detail
 
-> **Props are generated from this component's TypeScript types, the source of truth.** The following are supplementary (object-prop shapes, allowed values, or passthrough props), not the full prop list.
+> **Props and the object shapes they reference are generated from this component's TypeScript types, the source of truth.** The following is supplementary (sub-component props, allowed values, `ref` methods, or passthrough props), not the full prop list.
 
-| Prop           | Status   | Type      | Default | Description                 |
+| Prop           | Status   | Type / Options | Default | Description                 |
 | -------------- | -------- | --------- | ------- | --------------------------- |
 | `open`         | Optional | `boolean` | —       | Controlled open state       |
 | `defaultOpen`  | Optional | `boolean` | `false` | Uncontrolled initial state  |
@@ -44,7 +44,7 @@ composable parts for full control, or `SimplePopover` for the common case.
 
 ## `PopoverContent` Props detail
 
-| Prop         | Status   | Type                                     | Default    | Description                    |
+| Prop         | Status   | Type / Options | Default    | Description                    |
 | ------------ | -------- | ---------------------------------------- | ---------- | ------------------------------ |
 | `side`       | Optional | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Side relative to the trigger   |
 | `align`      | Optional | `"start" \| "center" \| "end"`           | `"center"` | Alignment along the side       |

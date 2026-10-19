@@ -8,9 +8,9 @@ Full role-based access control settings panel: user list with inline role editin
 | Prop | Status | Type / Options | Default | Description |
 |------|--------|----------------|---------|-------------|
 | `canWrite` | Required | `boolean` | - | Whether the current user may edit access settings |
-| `onCreateUser` | Required | `(data: { name: string; email: string; role: string; }) => Promise<void>` | - | Create a new user |
+| `onCreateUser` | Required | `(data: { name: string; email: string; role: string }) => Promise<void>` | - | Create a new user |
 | `onDeleteUser` | Required | `(userId: string) => Promise<void>` | - | Delete a user |
-| `onUpdateUser` | Required | `(data: { id: string; name: string; email: string; role: string; }) => Promise<void>` | - | Update an existing user's role |
+| `onUpdateUser` | Required | `(data: { id: string; name: string; email: string; role: string }) => Promise<void>` | - | Update an existing user's role |
 | `permissionLabels` | Required | `Record<string, string>` | - | Display labels for permission keys |
 | `rolePermissions` | Required | `Record<string, Record<string, PermLevel>>` | - | Permission levels per role |
 | `roles` | Required | `RoleOption[]` | - | Available role options |

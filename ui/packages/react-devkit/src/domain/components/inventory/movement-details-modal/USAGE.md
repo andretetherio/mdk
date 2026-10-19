@@ -12,6 +12,17 @@ of both location and status, with color-coded badges.
 | `isOpen` | Optional | `boolean` | `false` | Whether the modal is open |
 | `movement` | Optional | `MovementData` | - | The selected movement; when omitted the modal renders nothing |
 | `onClose` | Optional | `() => void` | - | Called when the modal requests to close (overlay click, escape, or close button) |
+
+### `MovementData`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `destination` | Required | `string` | - | Location key after the move (a `MINER_LOCATIONS` value); drives the destination badge label and color |
+| `newStatus` | Required | `string` | - | Status key after the move (a `MINER_STATUSES` value); shown via `MINER_STATUS_NAMES`, raw key if unmapped |
+| `origin` | Required | `string` | - | Location key before the move (a `MINER_LOCATIONS` value such as `site.warehouse`); drives the origin badge label and color |
+| `previousStatus` | Required | `string` | - | Status key before the move (a `MINER_STATUSES` value such as `faulty`); shown via `MINER_STATUS_NAMES`, raw key if unmapped |
+| `comments` | Optional | `React.ReactNode` | - | Free-form notes rendered below the transition; hidden when empty |
+| `device` | Optional | `object` | - | Moved device; when omitted the device summary panel is hidden |
 <!-- END GENERATED: props -->
 
 ## When to use

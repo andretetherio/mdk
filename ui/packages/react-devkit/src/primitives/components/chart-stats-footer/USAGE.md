@@ -8,29 +8,25 @@ Displays Min/Max/Avg values and an optional grid of additional stat items below 
 | Prop | Status | Type / Options | Default | Description |
 |------|--------|----------------|---------|-------------|
 | `className` | Optional | `string` | - | Custom class name |
-| `minMaxAvg` | Optional | `Partial<{ min: string; max: string; avg: string; }>` | - | Min/Max/Avg values row |
+| `minMaxAvg` | Optional | `Partial<{ min: string; max: string; avg: string }>` | - | Min/Max/Avg values row |
 | `secondaryLabel` | Optional | `SecondaryLabel` | - | Secondary label displayed below stats |
 | `stats` | Optional | `ChartStatsFooterItem[]` | - | Additional stats displayed in a columnar grid |
 | `statsPerColumn` | Optional | `number` | `1` | Number of stat items per column (default: 1) |
-<!-- END GENERATED: props -->
-
-## Props detail
-
-> **Props are generated from this component's TypeScript types, the source of truth.** The following are supplementary (object-prop shapes, allowed values, or passthrough props), not the full prop list.
 
 ### `ChartStatsFooterItem`
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `label` | `string` | yes | Stat label |
-| `value` | `string \| number` | yes | Stat value |
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `label` | Required | `string` | - | Stat label |
+| `value` | Required | `string \| number` | - | Stat value |
 
 ### `SecondaryLabel`
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `title` | `string` | yes | Label text |
-| `value` | `string \| number` | yes | Value text |
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `title` | Required | `string` | - | Label text |
+| `value` | Required | `string \| number` | - | Value text |
+<!-- END GENERATED: props -->
 
 ## Example
 

@@ -12,7 +12,7 @@ exported alongside the component for use in the consuming submit handler.
 |------|--------|----------------|---------|-------------|
 | `isOpen` | Required | `boolean` | - | Whether the modal is open |
 | `onClose` | Required | `VoidFunction` | - | Called when the modal requests to close |
-| `onSubmit` | Required | `(records: CSVRecord[]) => Promise<void \| { error?: string \| undefined; }>` | - | Submit handler; return `{ error }` to show an inline error |
+| `onSubmit` | Required | `(records: CSVRecord[]) => Promise<void \| { error?: string }>` | - | Submit handler; return `{ error }` to show an inline error |
 | `isLoading` | Optional | `boolean` | - | Renders a loader instead of the form |
 <!-- END GENERATED: props -->
 

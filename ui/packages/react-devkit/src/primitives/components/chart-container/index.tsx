@@ -12,24 +12,37 @@ export type RangeSelectorOption = {
 }
 
 export type RangeSelectorProps = {
+  /** `{ label, value }` items */
   options: RangeSelectorOption[]
+  /** Currently selected value */
   value: string
+  /** Fires when user picks a range */
   onChange: (value: string) => void
+  /** Additional class for the selector */
   className?: string
+  /** Inline style for the selector */
   style?: CSSProperties
+  /** Additional class for each option button */
   buttonClassName?: string
 }
 
 export type HighlightedValueProps = {
+  /** The primary value to display */
   value: string | number
+  /** Unit suffix */
   unit?: string
+  /** Additional class */
   className?: string
+  /** Inline style */
   style?: CSSProperties
 }
 
 export type LegendItem = {
+  /** Legend label */
   label: string
+  /** Color string (hex, hsl, etc.) */
   color: string
+  /** Whether this dataset is currently hidden */
   hidden?: boolean
 }
 

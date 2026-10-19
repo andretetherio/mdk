@@ -22,7 +22,7 @@ export const VERB = Object.freeze({
 })
 
 export const ENTITY = Object.freeze({
-  SITE: 'site', DEVICE: 'device', WORKER: 'worker', POOL: 'pool'
+  SITE: 'site', DEVICE: 'device', WORKER: 'worker', POOL: 'pool', REPORT: 'report', MEASUREMENT: 'measurement'
 })
 
 export const AXIS = Object.freeze({
@@ -138,6 +138,11 @@ export const VERB_FLOOR = Object.freeze({ [VERB.DIAGNOSE]: CAPABILITY.MID })
 
 const NAME_PATTERN = new RegExp(`^(${Object.values(VERB).join('|')})_(${Object.values(ENTITY).join('|')})s?$`)
 
+// Relaxed gating drops the verb_entity convention: a standard MCP tool ("search_files",
+// "get-weather") is named by whoever authored the server, not by this taxonomy. The name still
+// has to be a single identifier token so it renders and parses as a call.
+const RELAXED_NAME_PATTERN = /^[a-zA-Z0-9_-]+$/
+
 export const AGENT_META_KEY = 'x-mdk-agent'
 
 export const agentMeta = (tool) => tool?._meta?.[AGENT_META_KEY]
@@ -158,18 +163,33 @@ export const AgentMetaSchema = z.object({
  *
  * `meta` is the parsed block with defaults applied — read that, not the raw `_meta`, or an
  * omitted optional field arrives undefined.
+ *
+ * `strictToolGating` (default true) is the small-model floor: the verb_entity name, the
+ * `_meta['x-mdk-agent']` routing block, declared mutability, and the closed parameter vocabulary.
+ * Relaxed gating drops those so a domain agent backed by a stronger model can admit the standard
+ * MCP tools a Gateway or external server already exposes — a declared `_meta` block is still
+ * honoured when present, but its absence is not a rejection.
  */
-export function validateTool (tool) {
+export function validateTool (tool, { strictToolGating = true } = {}) {
   const errors = []
   const name = tool?.name
-  if (typeof name !== 'string' || !NAME_PATTERN.test(name)) {
-    errors.push(`name must be <verb>_<entity>, e.g. count_devices (verbs: ${Object.values(VERB).join('|')}; entities: ${Object.values(ENTITY).join('|')})`)
+  if (strictToolGating) {
+    if (typeof name !== 'string' || !NAME_PATTERN.test(name)) {
+      errors.push(`name must be <verb>_<entity>, e.g. count_devices (verbs: ${Object.values(VERB).join('|')}; entities: ${Object.values(ENTITY).join('|')})`)
+    }
+  } else if (typeof name !== 'string' || !RELAXED_NAME_PATTERN.test(name)) {
+    errors.push('name must be a single identifier token (letters, digits, "_" or "-")')
   }
   if (!tool?.description) errors.push('description is required — the model routes on it')
 
-  const parsed = AgentMetaSchema.safeParse(agentMeta(tool))
-  if (!parsed.success) {
+  // Strict mode requires the routing contract; relaxed mode only validates one that is present,
+  // leaving a synthesized fallback to admitTools when it is absent.
+  const rawMeta = agentMeta(tool)
+  const parsed = AgentMetaSchema.safeParse(rawMeta)
+  if (rawMeta !== undefined && !parsed.success) {
     errors.push(`_meta["${AGENT_META_KEY}"] invalid: ${parsed.error.issues.map((i) => `${i.path.join('.') || '(root)'} ${i.message}`).join('; ')}`)
+  } else if (strictToolGating && !parsed.success) {
+    errors.push(`_meta["${AGENT_META_KEY}"] invalid: missing or empty`)
   }
 
   const floor = VERB_FLOOR[verbOf(name)]
@@ -177,72 +197,185 @@ export function validateTool (tool) {
     errors.push(`a ${verbOf(name)}_* tool needs minCapability "${floor}" or higher, not "${parsed.data.minCapability}"`)
   }
 
+  // Mutability must be declared under strict gating. Relaxed gating tolerates an absent hint —
+  // admission treats it as a write (readOnlyHint: false), the fail-safe that keeps approval on —
+  // but a present hint must still be a boolean.
   const hints = tool?.annotations ?? {}
-  if (typeof hints.readOnlyHint !== 'boolean') errors.push('annotations.readOnlyHint must be declared true or false')
-  if (name?.startsWith(`${VERB.ACT}_`) && hints.readOnlyHint !== false) {
+  const hintDeclared = typeof hints.readOnlyHint === 'boolean'
+  if (!hintDeclared && (strictToolGating || hints.readOnlyHint !== undefined)) {
+    errors.push('annotations.readOnlyHint must be declared true or false')
+  }
+  const readOnly = hintDeclared ? hints.readOnlyHint : (strictToolGating ? undefined : false)
+  if (name?.startsWith(`${VERB.ACT}_`) && readOnly !== false) {
     errors.push('an act_* tool must declare readOnlyHint: false')
   }
 
-  errors.push(...validateParams(tool?.inputSchema))
+  errors.push(...validateParams(tool?.inputSchema, { strictToolGating }))
   return { ok: errors.length === 0, errors, meta: parsed.success ? parsed.data : undefined }
 }
 
-function classifyParam (spec) {
+/**
+ * Name the kind of a single parameter, or null when strict gating admits no kind for it.
+ *
+ * A small model cannot be trusted to invent a value, so strict gating admits only parameters it
+ * can copy from the prompt or from context: an enum to pick from, a bounded integer, a date-time,
+ * an id it has seen, or an array of those. A plain string with no enum and no id shape is free
+ * text — the hole through which a hallucinated value enters — and classifies to null.
+ *
+ * Relaxed gating never returns null: an id-shaped name ('id' or '*Id') is an id, and anything
+ * else falls back to 'text', so a standard MCP schema renders rather than being withheld.
+ */
+export function classifyParam (param, spec, { strictToolGating = true } = {}) {
   if (Array.isArray(spec?.enum) && spec.enum.length > 0) return 'enum'
   if (spec?.type === 'integer' && Number.isFinite(spec.minimum) && Number.isFinite(spec.maximum) &&
       spec.minimum <= spec.maximum) return 'int'
-  if (spec?.type === 'string' && typeof spec['x-mdk-ref'] === 'string') return 'ref'
+  if (spec?.type === 'string' && typeof spec?.['x-mdk-ref'] === 'string') return 'ref'
+  if (!strictToolGating) {
+    if (spec?.type === 'string' && spec?.format === 'date-time') return 'date'
+    if (spec?.type === 'array' && (Array.isArray(spec.items?.enum) || typeof spec.items?.['x-mdk-ref'] === 'string')) return 'array'
+    if (spec?.type === 'string' && (spec?.format === 'uuid' || typeof spec?.['x-mdk-id'] === 'string')) return 'id'
+    if (param === 'id' || /Id$/.test(String(param))) return 'id'
+    return 'text'
+  }
   return null
 }
 
-function validateParams (inputSchema) {
+function validateParams (inputSchema, { strictToolGating = true } = {}) {
   const errors = []
   const props = inputSchema?.properties ?? {}
   const required = new Set(Array.isArray(inputSchema?.required) ? inputSchema.required : [])
   for (const [param, spec] of Object.entries(props)) {
-    const kind = classifyParam(spec)
+    if (!strictToolGating && !RELAXED_NAME_PATTERN.test(param)) {
+      errors.push(`param "${param}" has an invalid name (letters, digits, "_" or "-" only)`)
+    }
+    if (!spec || typeof spec !== 'object') {
+      errors.push(`param "${param}" must be an object schema`)
+      continue
+    }
+    const kind = classifyParam(param, spec, { strictToolGating })
     if (!kind) {
       errors.push(`param "${param}" must be an enum, a bounded integer, or an id reference (x-mdk-ref) — never free text`)
     }
     if (kind === 'enum' && spec.enum.some((v) => String(v).includes('|'))) {
       errors.push(`param "${param}" has an enum value containing "|", which the prompt cannot render unambiguously`)
     }
-    if (!required.has(param) && spec?.default === undefined) {
+    if (kind === 'array' && Array.isArray(spec.items?.enum)) {
+      if (spec.items.enum.length === 0) {
+        errors.push(`param "${param}" array enum cannot be empty`)
+      } else if (spec.items.enum.some((v) => String(v).includes('|'))) {
+        errors.push(`param "${param}" has an array enum value containing "|", which the prompt cannot render unambiguously`)
+      }
+    }
+    // A default on every optional param is a strict-mode requirement: the small-model prompt
+    // renders one so the model never has to decide whether to omit a field. A standard MCP schema
+    // rarely carries defaults, so relaxed gating does not demand them.
+    if (strictToolGating && !required.has(param) && spec?.default === undefined) {
       errors.push(`optional param "${param}" needs a default`)
     }
   }
   return errors
 }
 
+const MAX_TOOL_NAME_LEN = 64
+const MAX_PROMPT_LINE_LEN = 200
+const MAX_RETURNS_LEN = 100
+const MAX_TYPE_DESC_LEN = 32
+
+const oneLine = (s, max = MAX_PROMPT_LINE_LEN) => String(s ?? '').replace(/\s+/g, ' ').trim().slice(0, max)
+
+// Mutating verbs: match kebab/snake prefixes case-insensitively, or camelCase (e.g. deleteFile, runQuery)
+const MUTATING_PREFIX = /^(act|create|update|delete|remove|write|set|send|exec|run|kill|restart|stop)(?:[-_]|$)/i
+const MUTATING_CAMEL = /^(act|create|update|delete|remove|write|set|send|exec|run|kill|restart|stop)[A-Z]/
+const isMutatingName = (name) => MUTATING_PREFIX.test(name) || MUTATING_CAMEL.test(name)
+
+/**
+ * Routing metadata synthesized for a standard MCP tool that carries none, so relaxed gating can
+ * render and route it. The tool's own description is all the routing signal a standard server
+ * gives us; the `useWhen` phrasings and the `returns` line are placeholders a stronger model
+ * tolerates, not the curated index a 4B needs — which is why this is relaxed-mode only.
+ */
+function fallbackMeta (tool, capability) {
+  const label = oneLine(tool?.description || tool?.name || 'tool', MAX_PROMPT_LINE_LEN)
+  return {
+    enabled: true,
+    answers: label,
+    useWhen: [label, `calling ${oneLine(tool?.name, MAX_TOOL_NAME_LEN)}`],
+    notFor: [],
+    outOfScope: [],
+    returns: 'result object',
+    minCapability: capability,
+    contract: TOOL_CONTRACT_VERSION,
+    synthesized: true
+  }
+}
+
 /**
  * Split tools into the ones this model may see and the ones it may not, each skip carrying a
  * reason. A tool whose capability floor exceeds the model is withheld rather than misused.
+ *
+ * `strictToolGating` (default true) keeps every small-model check: agent-enabled, the full
+ * contract, the capability floor. Relaxed gating drops the `_meta` requirement and the
+ * contract/floor screens — a domain agent admits what its Gateway exposes — while still
+ * rejecting a tool whose name or parameters cannot be rendered into a call.
  */
-export function admitTools (tools = [], { capability = CAPABILITY.SMALL } = {}) {
-  if (!(capability in CAPABILITY_RANK)) {
-    throw new Error(`admitTools: unknown capability "${capability}" (expected ${Object.values(CAPABILITY).join(', ')})`)
+export function admitTools (tools = [], { capability, strictToolGating = true } = {}) {
+  const cap = capability ?? (strictToolGating ? CAPABILITY.SMALL : CAPABILITY.MID)
+  if (!Object.hasOwn(CAPABILITY_RANK, cap)) {
+    throw new Error(`admitTools: unknown capability "${cap}" (expected ${Object.values(CAPABILITY).join(', ')})`)
+  }
+  if (!strictToolGating && CAPABILITY_RANK[cap] < CAPABILITY_RANK[CAPABILITY.MID]) {
+    throw new Error(`admitTools: strictToolGating:false requires capability "mid" or higher, got "${cap}"`)
   }
   const admitted = []
   const skipped = []
   for (const tool of tools) {
-    if (agentMeta(tool)?.enabled !== true) {
+    const declaredMeta = agentMeta(tool)
+    if (declaredMeta?.enabled === false) {
       skipped.push({ name: tool?.name, reason: 'not agent-enabled' })
       continue
     }
-    const { ok, errors, meta } = validateTool(tool)
+    if (strictToolGating && declaredMeta?.enabled !== true) {
+      skipped.push({ name: tool?.name, reason: 'not agent-enabled' })
+      continue
+    }
+    const { ok, errors, meta } = validateTool(tool, { strictToolGating })
     if (!ok) {
       skipped.push({ name: tool?.name, reason: errors[0] })
       continue
     }
-    if (meta.contract !== TOOL_CONTRACT_VERSION) {
-      skipped.push({ name: tool.name, reason: `authored against contract ${meta.contract}, this agent speaks ${TOOL_CONTRACT_VERSION}` })
+    if (!strictToolGating) {
+      const hints = tool?.annotations ?? {}
+      const hintDeclared = typeof hints.readOnlyHint === 'boolean'
+      const claimedReadOnly = hintDeclared && hints.readOnlyHint === true && !isMutatingName(tool.name)
+      const annotations = { ...tool?.annotations, readOnlyHint: claimedReadOnly }
+      // AgentMetaSchema is a plain z.object that strips undeclared keys during safeParse, so meta
+      // never carries a server-declared synthesized flag; delete ensures it even if schema parsing changes.
+      const cleanMeta = meta ? { ...meta } : undefined
+      if (cleanMeta) delete cleanMeta.synthesized
+      // No contract or capability screen in relaxed mode: admit the tool, attaching its declared
+      // routing block when valid and a synthesized one otherwise so the renderer has a block to read.
+      const resolvedMeta = cleanMeta ?? fallbackMeta(tool, cap)
+      resolvedMeta.contractChecked = cleanMeta?.contract === TOOL_CONTRACT_VERSION
+      admitted.push({
+        ...tool,
+        annotations,
+        _meta: { ...tool._meta, [AGENT_META_KEY]: resolvedMeta }
+      })
       continue
     }
-    if (CAPABILITY_RANK[meta.minCapability] > CAPABILITY_RANK[capability]) {
-      skipped.push({ name: tool.name, reason: `needs a ${meta.minCapability} model` })
+    // AgentMetaSchema is a plain z.object that strips undeclared keys during safeParse, so meta
+    // never carries a server-declared synthesized flag; delete ensures it even if schema parsing changes.
+    const cleanMeta = { ...meta, contractChecked: true }
+    delete cleanMeta.synthesized
+    if (cleanMeta.contract !== TOOL_CONTRACT_VERSION) {
+      skipped.push({ name: tool.name, reason: `authored against contract ${cleanMeta.contract}, this agent speaks ${TOOL_CONTRACT_VERSION}` })
       continue
     }
-    admitted.push({ ...tool, _meta: { ...tool._meta, [AGENT_META_KEY]: meta } })
+    if (CAPABILITY_RANK[cleanMeta.minCapability] > CAPABILITY_RANK[cap]) {
+      skipped.push({ name: tool.name, reason: `needs a ${cleanMeta.minCapability} model` })
+      continue
+    }
+    admitted.push({ ...tool, _meta: { ...tool._meta, [AGENT_META_KEY]: cleanMeta } })
   }
   return { admitted, skipped }
 }
@@ -253,18 +386,18 @@ export function admitTools (tools = [], { capability = CAPABILITY.SMALL } = {}) 
  *
  * Input must be admitTools().admitted; anything else throws.
  */
-export function renderTools (tools = []) {
+export function renderTools (tools = [], { strictToolGating = true } = {}) {
   return tools.map((tool) => {
     const meta = agentMeta(tool)
     if (!meta || !Array.isArray(meta.useWhen) || !Array.isArray(meta.notFor)) {
       throw new TypeError(`renderTools: "${tool?.name ?? tool}" is not an admitted tool (_meta["${AGENT_META_KEY}"] missing or not normalized) — pass admitTools().admitted`)
     }
-    const lines = [`${tool.name} — ${meta.answers}`]
-    lines.push(`  use when : ${meta.useWhen.map((u) => `"${u}"`).join(', ')}`)
-    if (meta.notFor.length) lines.push(`  not for  : ${meta.notFor.join('; ')}`)
-    const params = renderParams(tool.inputSchema)
+    const lines = [`${oneLine(tool.name, MAX_TOOL_NAME_LEN)} — ${oneLine(meta.answers, MAX_PROMPT_LINE_LEN)}`]
+    lines.push(`  use when : ${meta.useWhen.map((u) => `"${oneLine(u, MAX_PROMPT_LINE_LEN)}"`).join(', ')}`)
+    if (meta.notFor.length) lines.push(`  not for  : ${meta.notFor.map((n) => oneLine(n, MAX_PROMPT_LINE_LEN)).join('; ')}`)
+    const params = renderParams(tool.inputSchema, { strictToolGating })
     if (params) lines.push(`  params   : ${params}`)
-    lines.push(`  returns  : ${meta.returns}`)
+    lines.push(`  returns  : ${oneLine(meta.returns, MAX_RETURNS_LEN)}`)
     return lines.join('\n')
   }).join('\n')
 }
@@ -276,8 +409,13 @@ export function renderTools (tools = []) {
  * This is the negative half of the tool block. The positive half (each tool's `useWhen`) tells
  * the model where to route; without this it has nothing to route *away* from, and declining
  * becomes the one behaviour the prompt cannot express.
+ *
+ * Under relaxed gating (strictToolGating: false), coverage rendering is omitted: a domain agent
+ * with a stronger model and a custom charter defines its own out-of-scope boundaries in the
+ * charter itself, rather than through MDK's fleet-specific negative-routing block.
  */
-export function renderCoverage (tools = [], { notCovered = NOT_COVERED } = {}) {
+export function renderCoverage (tools = [], { notCovered = NOT_COVERED, strictToolGating = true } = {}) {
+  if (!strictToolGating) return ''
   const declared = tools.flatMap((tool) => agentMeta(tool)?.outOfScope ?? [])
   const lines = [...new Set([...notCovered, ...declared])]
   if (!lines.length) return ''
@@ -289,15 +427,28 @@ export function renderCoverage (tools = [], { notCovered = NOT_COVERED } = {}) {
   ].join('\n')
 }
 
-function renderParams (inputSchema) {
+function renderParams (inputSchema, { strictToolGating = true } = {}) {
   const props = inputSchema?.properties ?? {}
   return Object.entries(props).map(([param, spec]) => {
-    const kind = classifyParam(spec)
+    const kind = classifyParam(param, spec, { strictToolGating })
     let type
     if (kind === 'enum') type = `[${spec.enum.join('|')}]`
     else if (kind === 'int') type = `<int ${spec.minimum}..${spec.maximum}>`
     else if (kind === 'ref') type = `<${spec['x-mdk-ref']} id>`
-    else throw new Error(`renderTools: param "${param}" is not admissible; render only admitTools().admitted`)
-    return `${param}=${type}${spec.default !== undefined ? `=${JSON.stringify(spec.default)}` : ''}`
+    else if (kind === 'date') type = '<ISO date-time>'
+    else if (kind === 'id') {
+      const ref = spec?.['x-mdk-ref']
+      type = ref ? `<${ref} id>` : (param.endsWith('Id') ? '<id>' : `<${param} id>`)
+    } else if (kind === 'array') {
+      const itemDesc = spec?.items?.enum ? spec.items.enum.join('|') : (spec?.items?.['x-mdk-ref'] ? `<${spec.items['x-mdk-ref']} id>` : 'item')
+      type = `[${itemDesc}, ...]`
+    } else if (!strictToolGating) {
+      // Relaxed gating renders any remaining type rather than throwing — a free-text param is a
+      // valid MCP parameter here, not the contract breach it is under strict gating.
+      type = `<${oneLine(spec?.type, MAX_TYPE_DESC_LEN) || 'text'}>`
+    } else {
+      throw new Error(`renderTools: param "${param}" is not admissible; render only admitTools().admitted`)
+    }
+    return `${param}=${type}${spec?.default !== undefined ? `=${JSON.stringify(spec.default)}` : ''}`
   }).join(', ')
 }

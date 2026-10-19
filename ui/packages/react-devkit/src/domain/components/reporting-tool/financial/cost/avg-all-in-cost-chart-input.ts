@@ -5,8 +5,11 @@ import type { ToBarChartDataInput } from '../../utils/to-bar-chart-data'
 import { COST_BAR_WIDTH, COST_COLOR, REVENUE_COLOR } from './cost-chart-shared'
 
 export type AvgAllInCostDataPoint = {
+  /** Period timestamp (ms epoch); formatted as the bucket's x-axis label for the selected period */
   ts: number
+  /** Revenue per MWh consumed in the period, in USD/MWh; drawn as the Revenue bar */
   revenueUSDPerMWh: number
+  /** All-in cost per MWh consumed in the period, in USD/MWh; drawn as the Cost bar */
   costUSDPerMWh: number
 }
 

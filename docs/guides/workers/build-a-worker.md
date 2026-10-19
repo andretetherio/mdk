@@ -847,6 +847,9 @@ For errors from a live Kernel registration or requests once your Worker is actua
 
 ## Next steps
 
+- List your Worker in the catalogue, either:
+  - [Raise an issue](https://github.com/tetherto/mdk/issues) and share the link to your Worker contract
+  - Add a row to [`external-workers.json`](../../../backend/workers/external-workers.json)
 - Test your new [Worker's integration with MDK][test-a-worker]
 - Understand the [security boundaries][security-boundaries]
 - See the end-user experience of controlling and monitoring your device via the Worker in [Test a Worker's next steps][test-a-worker-next-steps]

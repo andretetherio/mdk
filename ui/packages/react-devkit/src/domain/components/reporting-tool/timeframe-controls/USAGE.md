@@ -38,6 +38,24 @@ Controls for selecting a reporting time frame: year, month, and optional week pi
 | `selectedMonth` | Required | `number` | - | - |
 | `selectedYear` | Required | `number` | - | - |
 | `timezone` | Required | `string` | - | - |
+
+### `TimeframeControlsDateRange`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `end` | Required | `number` | - | Range end (epoch ms); matched with `start` against calendar weeks to restore a week selection |
+| `start` | Required | `number` | - | Range start (epoch ms); the year/month/week pickers sync to this date |
+
+### `Week`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `bucketMonth` | Required | `number` | - | Month (0-11) of the week's end date in the selected timezone; sent as `month` to `onRangeChange` |
+| `bucketYear` | Required | `number` | - | Year of the week's end date in the selected timezone; sent as `year` to `onRangeChange` |
+| `end` | Required | `Date` | - | Sunday 23:59:59.999 (local time) that closes the week, capped to the end of yesterday |
+| `label` | Required | `string` | - | Option text, `DD/MM - DD/MM` in the selected timezone |
+| `start` | Required | `Date` | - | Monday 00:00:00.000 (local time) that opens the week |
+| `disabled` | Optional | `boolean` | - | True when the week starts after the end of yesterday; the option is shown but not selectable |
 <!-- END GENERATED: props -->
 
 ## Minimal example

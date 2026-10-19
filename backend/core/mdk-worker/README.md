@@ -12,7 +12,8 @@ const { WorkerRuntime, loadPlugin, loadContract, createInstance, createModuleCon
 ```
 
 - `WorkerRuntime`: starts the Hyperswarm RPC server, dispatches MDK Protocol actions to per-device handlers, and
-  persists the DHT/RPC keypair
+  persists the DHT/RPC keypair. It creates `opts.storeDir` owner-only (mode `0700`) and writes any file-backed seed
+  `0600`, so the Worker's identity stays readable only by its owner
 - `loadPlugin`: loads a plugin object (`mdk-contract.json`, handlers, ...) from a directory
 - `loadContract`, `createInstance`, `createModuleContext` — the loader internals `loadPlugin` composes
 

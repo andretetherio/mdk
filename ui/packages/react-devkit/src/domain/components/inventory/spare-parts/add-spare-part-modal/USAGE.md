@@ -16,7 +16,7 @@ is required only when a controller part type is selected; other part types requi
 | `modelOptions` | Required | `FormSelectOption[]` | - | Part model options for the active part type |
 | `onClose` | Required | `VoidFunction` | - | Called when the modal requests to close |
 | `onPartTypeChange` | Required | `(partTypeId: string) => void` | - | Called when the active part type changes (refetch model options here) |
-| `onSubmit` | Required | `(values: AddSparePartFormValues) => Promise<void \| { fieldErrors?: { field: string; message: string; }[] \| undefined; }>` | - | Submit handler; return `fieldErrors` to surface server-side validation |
+| `onSubmit` | Required | `(values: AddSparePartFormValues) => Promise<void \| { fieldErrors?: { field: string; message: string }[] \| undefined }>` | - | Submit handler; return `fieldErrors` to surface server-side validation |
 | `partTypes` | Required | `SparePartSubTypesModalPartType[]` | - | Part-type tabs |
 | `statusOptions` | Required | `FormSelectOption[]` | - | Status options |
 | `defaultPartTypeId` | Optional | `string` | - | Initially selected part type |
@@ -24,7 +24,7 @@ is required only when a controller part type is selected; other part types requi
 | `isLoading` | Optional | `boolean` | - | Renders a loader instead of the form |
 | `isModelOptionsLoading` | Optional | `boolean` | - | Disables the model select while options load |
 | `isSubTypesLoading` | Optional | `boolean` | - | Loading state for the embedded subtypes modal |
-| `onAddSubType` | Optional | `((name: string) => Promise<void \| { error?: string \| undefined; }>)` | - | Add handler for the embedded subtypes modal; return `{ error }` to surface a field error |
+| `onAddSubType` | Optional | `((name: string) => Promise<void \| { error?: string }>)` | - | Add handler for the embedded subtypes modal; return `{ error }` to surface a field error |
 | `onSubTypesPartTypeChange` | Optional | `((id: string) => void)` | - | Called when the active tab changes in the embedded subtypes modal |
 | `subTypes` | Optional | `string[]` | - | Subtype names for the active part type in the embedded modal |
 | `subTypesActivePartTypeId` | Optional | `string` | - | Active part type for the embedded subtypes modal |

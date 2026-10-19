@@ -80,7 +80,8 @@ const server = await startGateway({
 
 > [!NOTE]
 > Pre v1.0, Kernel's allowlist `auth.whitelist` defaults to empty and admits any HRPC caller. For production deployments, add the Gateway's
-> DHT public key to Kernel's allowlist — see the [Gateway concept page][gateway-concept] and [`opts.kernelKey` reference][mdk-readme].
+> DHT public key (`status.rpcClientKey` in its status file, stable across restarts) to Kernel's allowlist — see the
+> [Gateway concept page][gateway-concept] and [`opts.kernelKey` reference][mdk-readme].
 
 </Step>
 

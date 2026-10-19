@@ -16,6 +16,11 @@ const DIST = path.join(PKG_DIR, 'dist', 'skills')
 
 const SKILL_MD_MAX_LINES = 500
 
+// Every assembled SKILL.md carries this frontmatter line. It is the ownership
+// marker the installer uses to tell a stale MDK-shipped skill (safe to sweep)
+// from a user-authored skill that merely sits in the same directory.
+const SUITE_MARKER = /^\s*suite:\s*mdk-developer-skill\s*$/m
+
 export const CLIENT_DIRS = {
   cursor: ['.cursor', 'skills'],
   claude: ['.claude', 'skills']
@@ -134,14 +139,43 @@ export function assemble () {
   return { files: files.length, version: mdkVersion }
 }
 
+/** True when `<dir>/SKILL.md` exists and is stamped as part of the MDK suite. */
+function isSuiteSkill (dir) {
+  try {
+    return SUITE_MARKER.test(fs.readFileSync(path.join(dir, 'SKILL.md'), 'utf8'))
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Remove MDK-shipped skill dirs in `targetDir` that the current suite no longer
+ * ships (renamed or dropped between MDK versions). Installs are copies, so
+ * without this a rerun would leave the stale dir behind and the agent would
+ * keep loading it. Dirs without the suite marker are left alone.
+ */
+function sweepStale (targetDir, shipped) {
+  const removed = []
+  for (const entry of fs.readdirSync(targetDir, { withFileTypes: true })) {
+    if (!entry.isDirectory() || shipped.has(entry.name)) continue
+    const dir = path.join(targetDir, entry.name)
+    if (!isSuiteSkill(dir)) continue
+    fs.rmSync(dir, { recursive: true, force: true })
+    removed.push(entry.name)
+  }
+  return removed
+}
+
 /**
  * Install the assembled skills into a project's client skills directories.
+ * Stale MDK-shipped skills (present in the target but absent from the current
+ * suite) are removed; user-authored skills are never touched.
  *
  * @param {object} [options]
  * @param {'cursor'|'claude'|'all'} [options.client='all']
  * @param {string} [options.target=process.cwd()] Project root to install into.
  * @param {boolean} [options.assembleIfMissing=true] Assemble first if `dist/skills/` is empty.
- * @returns {{ skills: string[], installed: Array<{ client: string, dir: string }> }}
+ * @returns {{ skills: string[], installed: Array<{ client: string, dir: string, removed: string[] }> }}
  */
 export function installSkills ({ client = 'all', target = process.cwd(), assembleIfMissing = true } = {}) {
   const clients = client === 'all' ? Object.keys(CLIENT_DIRS) : [client]
@@ -158,15 +192,17 @@ export function installSkills ({ client = 'all', target = process.cwd(), assembl
   if (!skills.length) throw new Error(`no skills found in ${DIST}`)
 
   const projectRoot = path.resolve(target)
+  const shipped = new Set(skills.map((s) => s.name))
   const installed = []
   for (const c of clients) {
     const targetDir = path.join(projectRoot, ...CLIENT_DIRS[c])
     fs.mkdirSync(targetDir, { recursive: true })
+    const removed = sweepStale(targetDir, shipped)
     for (const skill of skills) {
       fs.rmSync(path.join(targetDir, skill.name), { recursive: true, force: true })
       fs.cpSync(path.join(DIST, skill.name), path.join(targetDir, skill.name), { recursive: true })
     }
-    installed.push({ client: c, dir: targetDir })
+    installed.push({ client: c, dir: targetDir, removed })
   }
 
   return { skills: skills.map((s) => s.name), installed }

@@ -15,6 +15,17 @@ indicators, loading skeleton, and empty state.
 | `label` | Optional | `string` | `"Active Alerts"` | Header label shown above the list |
 | `onItemClick` | Optional | `(id: string) => void` | - | Called with the incident id when a row is clicked |
 | `skeletonRows` | Optional | `number` | `4` | Number of skeleton rows shown when `isLoading` |
+
+### `TIncidentRowProps`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `body` | Required | `string` | - | Third line of the row, under `subtitle` |
+| `id` | Required | `string` | - | Incident identifier; the virtual-list row key and the argument passed to the click handler |
+| `severity` | Required | `"high" \| "medium" \| "critical"` | - | `critical`, `high` or `medium`; sets the colored severity dot beside the row |
+| `subtitle` | Required | `string` | - | Second line of the row, under `title` |
+| `title` | Required | `string` | - | First line of the row |
+| `onClick` | Optional | `((id: string) => void)` | - | Row click handler, called with `id`; in `ActiveIncidentsCard` it is always replaced by `onItemClick` |
 <!-- END GENERATED: props -->
 
 ## Minimal example

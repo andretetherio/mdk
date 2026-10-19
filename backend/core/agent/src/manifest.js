@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
-import { CHARTER, CHARTER_VERSION } from './charter.js'
+import { CHARTER, charterVersionFor } from './charter.js'
 import { TOOL_CONTRACT_VERSION, agentMeta } from './tools.js'
 
 /**
@@ -53,6 +53,8 @@ export function gitCommit (cwd, run = execFileSync) {
  * @param {number} opts.reps            repetitions per case
  * @param {Array}  [opts.tools]         admitted tool descriptors
  * @param {string} [opts.system]        the session's system prompt, to detect a custom charter
+ * @param {string} [opts.charterVersion] explicit charter version stamp; falls back to the detected one
+ * @param {boolean} [opts.strictToolGating] whether the run's tools passed strict gating; default `true`
  * @param {string} opts.startedAt       ISO timestamp
  * @param {string} opts.finishedAt      ISO timestamp
  * @returns {object} the manifest
@@ -66,13 +68,19 @@ export function buildManifest ({
   reps,
   tools = [],
   system,
+  charterVersion,
+  strictToolGating = true,
   startedAt,
   finishedAt
 } = {}) {
+  const detectedCharter = charterVersionFor(system)
   return {
     batterySha256,
     agentCommit,
-    charter: (system !== undefined && system !== CHARTER) ? 'custom' : CHARTER_VERSION,
+    charter: charterVersion ?? detectedCharter,
+    charterVersion: charterVersion ?? detectedCharter,
+    charterSha256: sha256(system ?? CHARTER),
+    strictToolGating,
     contract: TOOL_CONTRACT_VERSION,
     model: provider.model ?? null,
     providerKind: provider.kind ?? null,

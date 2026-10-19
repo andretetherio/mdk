@@ -19,6 +19,13 @@ every container detail tab mounts into.
 | `children` | Optional | `React.ReactNode` | - | The active tab's body — supplied by the page (real content or a placeholder) |
 | `className` | Optional | `string` | - | Additional class for the root element |
 | `name` | Optional | `React.ReactNode` | - | Container display name shown in the header. Optional — omit it when the host already renders the container name as the page title (e.g. the shell's `PageLayout`), so the name is not shown twice |
+
+### `ContainerDetailTab`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `key` | Required | `string` | - | Route segment / Radix value, e.g. `"home"`, `"pdu"` |
+| `label` | Required | `string` | - | Human label, e.g. `"PDU Layout"` |
 <!-- END GENERATED: props -->
 
 ## Example

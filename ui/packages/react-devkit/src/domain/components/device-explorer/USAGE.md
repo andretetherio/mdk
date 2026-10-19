@@ -24,6 +24,21 @@ miners, containers, or cabinets. Designed to be controlled by URL state in the h
 | `onSelectedDevicesChange` | Optional | `((selections: RowSelectionState) => void)` | - | Setter for row selection |
 | `onSortingChange` | Optional | `((sorting: SortingState) => void)` | - | - |
 | `selectedDevices` | Optional | `RowSelectionState` | - | Controlled row-selection state |
+
+### `DeviceExplorerFilterOption`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `label` | Required | `string` | - | Text shown in the filter cascader |
+| `value` | Required | `string` | - | Category key at the top level (e.g. `status`), or a selectable value under it; selections reach `onFiltersChange` as `[category, value]` paths |
+| `children` | Optional | `DeviceExplorerFilterOption[]` | - | Values selectable under this category; omit on leaf options |
+
+### `DeviceExplorerSearchOption`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `label` | Required | `string` | - | Suggestion text, matched case-insensitively against the typed query and shown on the chip |
+| `value` | Required | `string` | - | Tag added to `searchTags` when this suggestion is picked (free-text tags are also allowed) |
 <!-- END GENERATED: props -->
 
 ## Minimal example

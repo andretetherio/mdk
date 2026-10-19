@@ -22,8 +22,11 @@ import { formatPercentShare } from '../../utils/number'
 const DoughnutCanvas = lazy(() => import('./doughnut-canvas'))
 
 export type DoughnutChartDataset = {
+  /** Slice label */
   label: string
+  /** Numeric slice value */
   value: number
+  /** Slice color (falls back to the built-in palette) */
   color?: string
 }
 

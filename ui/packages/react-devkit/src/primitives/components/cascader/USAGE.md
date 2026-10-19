@@ -15,20 +15,20 @@ A two-panel hierarchical selection component. The left panel lists categories; t
 | `onChange` | Optional | `((value: CascaderValue \| CascaderValue[] \| null) => void)` | - | Callback when selection changes - For single select: receives CascaderValue or null - For multiple select: receives CascaderValue[] or null |
 | `placeholder` | Optional | `string` | `"Select..."` | Placeholder text shown in the input when no selections are made |
 | `value` | Optional | `CascaderValue \| CascaderValue[]` | - | Current selected value(s) - For single select: CascaderValue (e.g., ['category', 'option']) - For multiple select: CascaderValue[] (e.g., [['cat1', 'opt1'], ['cat2', 'opt2']]) |
+
+### `CascaderOption`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `label` | Required | `string` | - | Display label for the option |
+| `value` | Required | `string \| number \| boolean` | - | Unique value for the option |
+| `children` | Optional | `CascaderOption[]` | - | Child options (creates a nested category) |
+| `disabled` | Optional | `boolean` | - | Whether the option is disabled |
 <!-- END GENERATED: props -->
 
 ## Props detail
 
-> **Props are generated from this component's TypeScript types, the source of truth.** The following are supplementary (object-prop shapes, allowed values, or passthrough props), not the full prop list.
-
-### `CascaderOption`
-
-| Field      | Status   | Type                          | Default | Description          |
-| ---------- | -------- | ----------------------------- | ------- | -------------------- |
-| `value`    | Required | `string \| number \| boolean` | —       | Unique option value  |
-| `label`    | Required | `string`                      | —       | Display label        |
-| `children` | Optional | `CascaderOption[]`            | —       | Child options (creates a nested category) |
-| `disabled` | Optional | `boolean`                     | —       | Disables this option |
+> **Props and the object shapes they reference are generated from this component's TypeScript types, the source of truth.** The following is supplementary (sub-component props, allowed values, `ref` methods, or passthrough props), not the full prop list.
 
 ### Types
 

@@ -4,7 +4,9 @@ import { forwardRef } from 'react'
 const noDataMessage = 'No data available'
 
 export type PoolDetailItem = {
+  /** Row label, rendered with a trailing colon */
   title: string
+  /** Row value; renders `-` when undefined or an empty string */
   value?: string | number
 }
 

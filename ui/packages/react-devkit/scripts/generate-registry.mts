@@ -43,6 +43,7 @@ import type {
   PropMeta,
   RegistryIndexes,
   RegistryManifest,
+  ShapeMeta,
   Tier,
   TypeMeta,
 } from "./registry-types.ts";
@@ -207,7 +208,13 @@ const formatPropType = (type: Type): string => {
     }
   }
   const core = type.getNonNullableType();
-  let text = formatType(type).replace(/\s*\|\s*undefined\s*$/, "").trim();
+  let text = formatType(type)
+    .replace(/\s*\|\s*undefined\s*$/, "")
+    // Inline object members: `?:` already says optional, so the checker's
+    // `?: T | undefined;` and the trailing `; }` are noise in a table cell.
+    .replace(/(\?: [^;{}]*?) \| undefined;/g, "$1;")
+    .replace(/; \}/g, " }")
+    .trim();
   if (
     text.length > OBJECT_COLLAPSE_CHARS
     && core.isObject() && !core.isArray()
@@ -301,6 +308,50 @@ const propsFromType = (type: Type): PropMeta[] => {
   }
 
   return props;
+};
+
+// A prop's type (or its array element) when it is a named object type declared
+// in the component's own directory — the thing a hand-written "Props detail"
+// table used to describe. Shared contracts from elsewhere in `src/` (e.g.
+// `Device`, used by 15 components) are deliberately not repeated per component;
+// lib/node_modules types, unions, functions and anonymous literals yield nothing.
+const localShapeOf = (type: Type, componentDir: string): { name: string; type: Type } | undefined => {
+  const core = type.getNonNullableType();
+  let target = core.isArray() ? core.getArrayElementTypeOrThrow() : core;
+  // `(string | CurrencyItem)[]`: a union with exactly one object member is that member.
+  if (target.isUnion()) {
+    const objects = target.getUnionTypes().filter((m) => m.isObject());
+    if (objects.length !== 1) return undefined;
+    target = objects[0]!;
+  }
+  if (!target.isObject() || target.getCallSignatures().length > 0) return undefined;
+  const symbol = target.getAliasSymbol() ?? target.getSymbol();
+  const declFile = symbol?.getDeclarations()[0]?.getSourceFile().getFilePath();
+  if (!symbol || !declFile || dirname(declFile) !== componentDir || isExcludedSourceFile(declFile)) return undefined;
+  const name = symbol.getName();
+  if (!/^[A-Z]\w*$/.test(name)) return undefined; // anonymous `__type` literals
+  return { name, type: target };
+};
+
+// One level only: a shape's own fields are not expanded further.
+const shapesFromType = (type: Type, componentDir: string): ShapeMeta[] => {
+  const shapes = new Map<string, ShapeMeta>();
+  for (const prop of type.getProperties()) {
+    const declaration = prop.getDeclarations().find(
+      d => !d.getSourceFile().getFilePath().includes("/node_modules/"),
+    );
+    if (!declaration) continue;
+    let shape: ReturnType<typeof localShapeOf>;
+    try {
+      shape = localShapeOf(prop.getTypeAtLocation(declaration), componentDir);
+    } catch {
+      continue;
+    }
+    if (!shape || shapes.has(shape.name)) continue;
+    const fields = propsFromType(shape.type);
+    if (fields.length) shapes.set(shape.name, { name: shape.name, fields });
+  }
+  return [...shapes.values()];
 };
 
 // ─── Component / hook extraction ────────────────────────────────────────────
@@ -424,12 +475,15 @@ const buildComponentMeta = (resolved: ResolvedComponent): ComponentMeta => {
   const tier = parseTier(getJsDocTagValues(resolved.jsDocs, "tier")[0]);
 
   let props: PropMeta[] = [];
+  let shapes: ShapeMeta[] = [];
   const firstParam = resolved.parameters[0];
   if (firstParam) {
     try {
       props = propsFromType(firstParam.getType());
+      shapes = shapesFromType(firstParam.getType(), dirname(resolved.sourceFile.getFilePath()));
     } catch {
       props = [];
+      shapes = [];
     }
   }
 
@@ -455,6 +509,7 @@ const buildComponentMeta = (resolved: ResolvedComponent): ComponentMeta => {
       : undefined,
     domainContext: domainContext ? (domainContext as ComponentMeta["domainContext"]) : undefined,
     props,
+    ...(shapes.length ? { shapes } : {}),
     ...(isAgentReady && examplePaths.length
       ? { examples: examplePaths.map(toRelativeFromPackage) }
       : {}),

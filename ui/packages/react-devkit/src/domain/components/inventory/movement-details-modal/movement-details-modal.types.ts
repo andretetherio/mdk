@@ -16,11 +16,17 @@ export type MovementDevice = Partial<{
 
 /** A single historical device movement: a location/status transition for one device. */
 export type MovementData = {
+  /** Location key before the move (a `MINER_LOCATIONS` value such as `site.warehouse`); drives the origin badge label and color */
   origin: string
+  /** Location key after the move (a `MINER_LOCATIONS` value); drives the destination badge label and color */
   destination: string
+  /** Status key before the move (a `MINER_STATUSES` value such as `faulty`); shown via `MINER_STATUS_NAMES`, raw key if unmapped */
   previousStatus: string
+  /** Status key after the move (a `MINER_STATUSES` value); shown via `MINER_STATUS_NAMES`, raw key if unmapped */
   newStatus: string
+  /** Moved device; when omitted the device summary panel is hidden */
   device?: MovementDevice
+  /** Free-form notes rendered below the transition; hidden when empty */
   comments?: ReactNode
 }
 

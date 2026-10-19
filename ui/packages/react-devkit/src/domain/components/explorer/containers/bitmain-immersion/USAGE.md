@@ -19,7 +19,7 @@ Each of the other six components has its own props, documented in its co-located
 
 | Prop | Status | Type / Options | Default | Description |
 |------|--------|----------------|---------|-------------|
-| `containerSettings` | Optional | `{ thresholds?: Record<string, unknown> \| undefined; } \| null` | `null` | Container settings with custom thresholds |
+| `containerSettings` | Optional | `{ thresholds?: Record<string, unknown> } \| null` | `null` | Container settings with custom thresholds |
 | `data` | Optional | `Device` | - | Device data |
 <!-- END GENERATED: props -->
 

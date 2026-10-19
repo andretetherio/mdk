@@ -107,12 +107,16 @@ export const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
 DatePicker.displayName = 'DatePicker'
 
 export type DateRange = {
+  /** Range start; `undefined` means nothing is selected and the placeholder shows */
   from: Date | undefined
+  /** Range end; while unset the trigger shows `from` alone and Apply stays disabled */
   to?: Date | undefined
 }
 
 export type PresetItem = {
+  /** Preset button text; also used as the React key, so keep it unique */
   label: string
+  /** Range applied to the draft on click; needs both `from` and `to`. Highlighted when the draft is within 5 minutes of it at both ends */
   value: DateRange
 }
 

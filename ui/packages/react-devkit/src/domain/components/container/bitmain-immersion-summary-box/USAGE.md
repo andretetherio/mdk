@@ -9,6 +9,12 @@ Summary card for a BitMain immersion-cooled container. Displays supply temperatu
 |------|--------|----------------|---------|-------------|
 | `containerSettings` | Optional | `BitMainImmersionSummaryBoxContainerSettings \| null` | `null` | Optional threshold configuration that drives colour/flash states on temperature stats |
 | `data` | Optional | `Device` | - | Live device object from the devices store. Returns `null` when omitted |
+
+### `BitMainImmersionSummaryBoxContainerSettings`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `thresholds` | Optional | `Record<string, unknown>` | - | Container threshold config from the API; `oilTemperature` (`criticalLow`, `alert`, `normal`, `alarm`, `criticalHigh`) sets the supply-temperature colors and flashing, otherwise built-in defaults apply |
 <!-- END GENERATED: props -->
 
 ## Minimal example

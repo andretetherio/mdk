@@ -75,6 +75,47 @@ cost-summary view model.
 | `costLog` | Required | `readonly CostTimeSeriesEntry[]` | - | - |
 | `dateRange` | Required | `FinancialDateRange \| null` | - | - |
 | `isLoading` | Optional | `boolean` | - | - |
+
+### `AvgAllInCostDataPoint`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `costUSDPerMWh` | Required | `number` | - | All-in cost per MWh consumed in the period, in USD/MWh; drawn as the Cost bar |
+| `revenueUSDPerMWh` | Required | `number` | - | Revenue per MWh consumed in the period, in USD/MWh; drawn as the Revenue bar |
+| `ts` | Required | `number` | - | Period timestamp (ms epoch); formatted as the bucket's x-axis label for the selected period |
+
+### `CostSummaryDisplayMetrics`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `allInCost` | Required | `CostSummaryMetric` | - | All-in cost per MWh for the range (API `avgAllInCostPerMWh`); the highlighted first tile |
+| `energyCost` | Required | `CostSummaryMetric` | - | Energy cost per MWh for the range (API `avgEnergyCostPerMWh`) |
+| `operationsCost` | Required | `CostSummaryMetric` | - | Operational cost per MWh, derived as `totalOperationalCostsUSD / totalConsumptionMWh`; `value` is `null` when consumption is zero |
+
+### `CostTimeSeriesEntry`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `energyCostUSD` | Required | `number` | - | Energy cost for the period, in USD |
+| `operationalCostUSD` | Required | `number` | - | Operational (non-energy) cost for the period, in USD |
+| `totalCostUSD` | Required | `number` | - | Total (energy + operational) cost for the period, in USD; drawn as the Production Cost bar |
+| `ts` | Required | `number` | - | Period timestamp (ms epoch); formatted as the bucket's x-axis label for the selected period; joined with `btcPriceLog` entries on this value |
+
+### `BtcPriceTimeSeriesEntry`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `priceUSD` | Required | `number` | - | BTC price for the period, in USD; drawn as the BTC Price bar (0 when the period has no entry) |
+| `ts` | Required | `number` | - | Period timestamp (ms epoch); must match the `costLog` entry it pairs with |
+
+### `CostSummaryMonetaryTotals`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `totalConsumptionMWh` | Required | `number` | - | Energy consumed over the range, in MWh |
+| `totalCostsUSD` | Required | `number` | - | Energy plus operational cost summed over the range, in USD |
+| `totalEnergyCostsUSD` | Required | `number` | - | Energy cost summed over the range, in USD; the Energy slice of the doughnut (omitted when 0) |
+| `totalOperationalCostsUSD` | Required | `number` | - | Operational cost summed over the range, in USD; the Operations slice of the doughnut (omitted when 0) |
 <!-- END GENERATED: props -->
 
 ## Minimal example

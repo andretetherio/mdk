@@ -28,6 +28,14 @@ instead.
 | `size` | Optional | `"sm" \| "md" \| "lg"` | `"lg"` | Trigger sizing tokens. Mirror the `<Select>` sizes |
 | `value` | Optional | `string[]` | - | Controlled selected values. Omit to use `defaultValue` for uncontrolled mode |
 | `variant` | Optional | `"default" \| "colored"` | `"default"` | `'colored'` paints the trigger in the primary tint (matches `<Select>`'s colored variant) |
+
+### `MultiSelectOption`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `label` | Required | `React.ReactNode` | - | Shown in the option row and on the selected chip; a string label also names the chip's remove button |
+| `value` | Required | `string` | - | Value added to or removed from the selection; matched by strict equality, and also the React key |
+| `disabled` | Optional | `boolean` | - | Option is shown but cannot be toggled from the list; an already-selected one can still be removed via its chip |
 <!-- END GENERATED: props -->
 
 ## Example

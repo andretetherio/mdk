@@ -8,7 +8,7 @@ Modal for editing an existing user's name, email, and role. Shows a role-permiss
 | Prop | Status | Type / Options | Default | Description |
 |------|--------|----------------|---------|-------------|
 | `onClose` | Required | `VoidFunction` | - | Called when the dialog closes |
-| `onSubmit` | Required | `(data: { id: string; name: string; email: string; role: string; }) => Promise<void>` | - | Save handler |
+| `onSubmit` | Required | `(data: { id: string; name: string; email: string; role: string }) => Promise<void>` | - | Save handler |
 | `open` | Required | `boolean` | - | Controls dialog visibility |
 | `permissionLabels` | Required | `Record<string, string>` | - | Display labels for permission keys |
 | `rolePermissions` | Required | `Record<string, Record<string, PermLevel>>` | - | Permission levels per role |

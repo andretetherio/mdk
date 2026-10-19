@@ -31,6 +31,7 @@ export function registerSkill(program: Command): void {
         return;
       }
       if (result.message) process.stdout.write(`${result.message}\n`);
+      if (result.detail) process.stdout.write(`${result.detail}\n`);
       process.stderr.write('MDK Developer Skill installed.\n');
     });
 }

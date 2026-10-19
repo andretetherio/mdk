@@ -2,8 +2,11 @@ import { forwardRef, type ReactElement, type ReactNode } from 'react'
 import { cn } from '../../utils'
 
 export type BreadcrumbItem = {
+  /** Text shown for the crumb */
   label: string
+  /** Renders the crumb as a link; takes precedence over `onClick` */
   href?: string
+  /** Renders the crumb as a button when `href` is absent; with neither, the crumb is plain text */
   onClick?: VoidFunction
 }
 

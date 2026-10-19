@@ -99,12 +99,12 @@ Check:
 
 ## File lock or key file errors
 
-The examples call `getKernel()` with default local paths. By default, the topic file is `os.tmpdir()/mdk/.dht-topic` and the kernel key file is `os.tmpdir()/mdk/.kernel-key`. If another Kernel, gateway, or example is already running with the same defaults, you may see file lock errors, or clients may pick up the wrong Kernel key from the shared key file.
+The examples call `getKernel()` with default local paths. By default, the topic file is `~/.mdk/.dht-topic` and the kernel key file is `~/.mdk/.kernel-key`. If another Kernel, gateway, or example is already running with the same defaults, you may see file lock errors, or clients may pick up the wrong Kernel key from the shared key file.
 
-Stop stale example processes before starting another example. If you need to run several examples side by side for development, run each process with a different temporary directory so each Kernel gets separate local state:
+Stop stale example processes before starting another example. If you need to run several examples side by side for development, run each process with a different home directory so each Kernel gets separate local state:
 
 ```bash
-TMPDIR=/tmp/mdk-antminer-s21 node backend/workers/miners/antminer/examples/run-s21.js
+HOME=/tmp/mdk-antminer-s21 node backend/workers/miners/antminer/examples/run-s21.js
 ```
 
 ## Still blocked

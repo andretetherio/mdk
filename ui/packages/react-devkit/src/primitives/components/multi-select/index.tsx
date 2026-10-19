@@ -23,8 +23,11 @@ export type MultiSelectSize = 'sm' | 'md' | 'lg'
 export type MultiSelectVariant = 'default' | 'colored'
 
 export type MultiSelectOption = {
+  /** Value added to or removed from the selection; matched by strict equality, and also the React key */
   value: string
+  /** Shown in the option row and on the selected chip; a string label also names the chip's remove button */
   label: ReactNode
+  /** Option is shown but cannot be toggled from the list; an already-selected one can still be removed via its chip */
   disabled?: boolean
 }
 

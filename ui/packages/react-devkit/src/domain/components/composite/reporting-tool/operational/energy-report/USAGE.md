@@ -11,7 +11,16 @@ Operational **Energy** report with three tabs: site consumption trend, power mod
 | `defaultTab` | Optional | `"site-view" \| "miner-type-view" \| "miner-unit-view"` | - | - |
 | `minerTypeView` | Optional | `EnergyReportGroupedBarViewProps` | - | - |
 | `minerUnitView` | Optional | `EnergyReportGroupedBarViewProps` | - | - |
-| `siteView` | Optional | `(Omit<EnergyReportSiteViewProps, "dateRange"> & { dateRange?: EnergyReportDateRange \| undefined; })` | - | - |
+| `siteView` | Optional | `(Omit<EnergyReportSiteViewProps, "dateRange"> & { dateRange?: EnergyReportDateRange })` | - | - |
+
+### `EnergyReportGroupedBarViewProps`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `containers` | Optional | `Container[]` | - | Containers used to turn container keys into display names (miner-unit view only) |
+| `groupedConsumption` | Optional | `MetricsConsumptionGroupedResponse` | - | Consumption grouped by miner model or container; bars come from the last `log` entry's `powerW`, shown in MW |
+| `isLoading` | Optional | `boolean` | - | Shows the chart's loading state and suppresses the empty state |
+| `onTimeFrameChange` | Optional | `((start: Date, end: Date) => void)` | - | Called with the selected start and end dates on mount and whenever the time-frame selector changes them |
 <!-- END GENERATED: props -->
 
 ## Composite

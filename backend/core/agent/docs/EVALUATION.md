@@ -82,9 +82,11 @@ revised without invalidating a historical run.
 ## Provenance, and what it does not prove
 
 Every run records the conditions it happened under: the hash of the question file, the agent
-commit, the charter and contract versions, the model, the declared capability, and the budget it
-bought, the repetitions, and the admitted tool set with each tool's declared floor. The endpoint is
-stored as a hash rather than a URL, so an internal hostname cannot travel with a report.
+commit, the charter and contract versions (`charterVersion` plus `charterSha256`, the hash of the
+exact system prompt), the tool-admission mode (`strictToolGating`), the model, the declared
+capability, and the budget it bought, the repetitions, and the admitted tool set with each tool's
+declared floor. The endpoint is stored as a hash rather than a URL, so an internal hostname cannot
+travel with a report.
 
 Runs append to a ledger where each entry carries the hash of the entry before it. The chain is a
 tamper-evidence guardrail: it does not prevent an edit, it makes one visible. Altering a single run

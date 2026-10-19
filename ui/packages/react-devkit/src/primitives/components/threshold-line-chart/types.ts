@@ -17,7 +17,9 @@ export type ThresholdLineChartThreshold = {
 }
 
 export type ThresholdLineChartData = {
+  /** Data lines; points with a non-finite timestamp are dropped. All-zero values render the empty state */
   series: ThresholdLineChartSeries[]
+  /** Horizontal reference lines at a fixed `value`, spanning every timestamp in `series` */
   thresholds?: ThresholdLineChartThreshold[]
 }
 

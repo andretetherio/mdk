@@ -18,42 +18,41 @@ A layout wrapper for charts that provides a title/header row, interactive legend
 | `highlightedValue` | Optional | `HighlightedValueProps` | - | Large value/unit displayed alongside the legend |
 | `legendData` | Optional | `LegendItem[]` | - | Color-keyed legend items; each item can be toggled |
 | `loading` | Optional | `boolean` | - | Shows a centered `<Loader>` overlay |
-| `minMaxAvg` | Optional | `Partial<{ min: string; max: string; avg: string; }>` | - | Built-in footer showing Min / Avg / Max values |
+| `minMaxAvg` | Optional | `Partial<{ min: string; max: string; avg: string }>` | - | Built-in footer showing Min / Avg / Max values |
 | `onToggleDataset` | Optional | `((index: number) => void)` | - | Fired when a legend item is clicked |
 | `rangeSelector` | Optional | `RangeSelectorProps` | - | Radio-card time-range selector |
 | `timeRange` | Optional | `string` | - | Time range label shown in the footer |
 | `title` | Optional | `string` | - | Chart heading (renders as `<h3>` unless `header` is provided) |
 | `titleExtra` | Optional | `React.ReactNode` | - | Optional node rendered immediately after the title text (e.g. an info tooltip). Only shown when `title` is set and `header` is not. Additive - omit it and the title renders exactly as before |
-<!-- END GENERATED: props -->
-
-## Prop data shapes
-
-> **Props are generated from this component's TypeScript types, the source of truth.** The following are supplementary (object-prop shapes, allowed values, or passthrough props), not the full prop list.
 
 ### `LegendItem`
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `label` | `string` | yes | Legend label |
-| `color` | `string` | yes | Color string (hex, hsl, etc.) |
-| `hidden` | `boolean` | no | Whether this dataset is currently hidden |
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `color` | Required | `string` | - | Color string (hex, hsl, etc.) |
+| `label` | Required | `string` | - | Legend label |
+| `hidden` | Optional | `boolean` | - | Whether this dataset is currently hidden |
 
 ### `HighlightedValueProps`
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `value` | `string \| number` | yes | The primary value to display |
-| `unit` | `string` | no | Unit suffix |
-| `className` | `string` | no | Additional class |
-| `style` | `React.CSSProperties` | no | Inline style |
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `value` | Required | `string \| number` | - | The primary value to display |
+| `className` | Optional | `string` | - | Additional class |
+| `style` | Optional | `React.CSSProperties` | - | Inline style |
+| `unit` | Optional | `string` | - | Unit suffix |
 
 ### `RangeSelectorProps`
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `options` | `RangeSelectorOption[]` | yes | `{ label, value }` items |
-| `value` | `string` | yes | Currently selected value |
-| `onChange` | `(value: string) => void` | yes | Fires when user picks a range |
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `onChange` | Required | `(value: string) => void` | - | Fires when user picks a range |
+| `options` | Required | `RangeSelectorOption[]` | - | `{ label, value }` items |
+| `value` | Required | `string` | - | Currently selected value |
+| `buttonClassName` | Optional | `string` | - | Additional class for each option button |
+| `className` | Optional | `string` | - | Additional class for the selector |
+| `style` | Optional | `React.CSSProperties` | - | Inline style for the selector |
+<!-- END GENERATED: props -->
 
 ## Example
 

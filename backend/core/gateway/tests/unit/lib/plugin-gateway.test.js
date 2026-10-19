@@ -7,6 +7,7 @@ function makeWrk () {
   return {
     conf: { site: { name: 'test-site' }, ttl: 300 },
     ctx: { kernelKey: 'a'.repeat(64), kernelBootstrap: null },
+    net_r0: { dht: { defaultKeyPair: { publicKey: 'pk', secretKey: 'sk' } } },
     onGatewayReady (fn) { (this._readyWaiters ||= []).push(fn) }
   }
 }
@@ -16,9 +17,16 @@ test('plugin context - request-time surface: config', (t) => {
   const { context } = buildPluginContext(wrk, '/plugins/thing')
 
   t.is(context.config.kernelKey, 'a'.repeat(64), 'kernelKey from ctx')
+  t.is(context.config.kernelKeyPair(), wrk.net_r0.dht.defaultKeyPair, 'kernelKeyPair is the keypair status.rpcClientKey is read from')
   t.alike(context.config.site, { name: 'test-site' }, 'gateway conf spread into config')
   t.ok(Object.isFrozen(context.config), 'config frozen')
   t.ok(Object.isFrozen(context), 'context frozen')
+})
+
+test('plugin context - kernelKeyPair is undefined on a host without a DHT', (t) => {
+  const { context } = buildPluginContext({ ctx: {}, conf: {} }, '/plugins/thing')
+
+  t.is(context.config.kernelKeyPair(), undefined, 'the client falls back to an ephemeral key instead of throwing')
 })
 
 test('plugin context - per-plugin config merges over the gateway conf', (t) => {

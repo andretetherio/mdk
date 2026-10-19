@@ -12,17 +12,23 @@ export type TimelineChartDataset = {
 }
 
 export type TimelineChartData = {
+  /** Row labels, one row each; a data point lands in the row whose label equals its `y`. Nothing renders when empty */
   labels: string[]
+  /** Bar series; each dataset's `label` is its tooltip title and legend entry */
   datasets: TimelineChartDataset[]
 }
 
 export type ChartRange = {
+  /** Left edge of the time axis (`Date` or epoch ms); without a range the axis spans the data */
   min: Date | number
+  /** Right edge of the time axis (`Date` or epoch ms) */
   max: Date | number
 }
 
 export type AxisTitleText = {
+  /** Title under the time axis; hidden when empty */
   x: string
+  /** Title beside the row labels; hidden when empty */
   y: string
 }
 

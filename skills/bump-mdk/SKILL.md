@@ -60,9 +60,8 @@ embedded `file:`-dependency entries.
   forces a root lock regen (that's where `gateway`'s dependency entries now
   live).
 - **`backend/plugins/*`** — gateway plugins, also root workspace members
-  sharing the root lock, versioned independently of the release line (`agent`
-  is at `0.1.0` while the repo is at `0.6.0`), so a release bump does **not**
-  touch them. Their `@tetherto/*` deps are linked, never fetched, so pin them
+  sharing the root lock, and bumped with the release line like everything
+  else. Their `@tetherto/*` deps are linked, never fetched, so pin them
   at `*`: a version range there resolves against nothing and rots unnoticed —
   the agent plugin sat at `^0.0.0` across several releases with nothing to
   catch it.
@@ -79,8 +78,8 @@ embedded `file:`-dependency entries.
 As of the 0.6.0 cycle versioning is **uniform across the release line**: every
 tracked package sits at the same version, `mdk-worker` no longer lags, and
 `mdk-ui-shell-template` has moved off its scaffold default onto the shared
-version — treat it as a normal package in future bumps. Packages outside the
-release line (`backend/plugins/*`) keep their own versions.
+version — treat it as a normal package in future bumps. The one exception is the
+vendored `backend/lib/mdk-crypto-lib`, which keeps its upstream version.
 
 Still **never blanket-set versions by find-and-replace.** Confirm the current spread
 first by *parsing* each manifest, not grepping it (a bare `grep -m1 '"version"'` can

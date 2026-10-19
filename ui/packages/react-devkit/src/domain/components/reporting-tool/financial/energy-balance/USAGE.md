@@ -62,6 +62,31 @@ Components for the Energy Balance financial reporting section.
 | Prop | Status | Type / Options | Default | Description |
 |------|--------|----------------|---------|-------------|
 | `metrics` | Required | `EnergyRevenueMetrics` | - | - |
+
+### `ThresholdLineChartInput`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `series` | Required | `{ label: string; points: { ts: number; value: number }[]; color?: string }[]` | - | Plotted lines; each point is `{ ts, value }` with `ts` in ms epoch. The first series' timestamps set the x positions of the `constants` lines |
+| `constants` | Optional | `{ label: string; value: number; color?: string; style?: { borderDash?: number[] } \| undefined }[]` | - | Horizontal reference lines (e.g. Power Availability) drawn at `value` across the first series' timestamps |
+
+### `EnergyCostMetrics`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `avgAllInCost` | Required | `number` | - | Average energy plus operational cost, shown in USD/MWh |
+| `avgEnergyCost` | Required | `number` | - | Average energy cost, shown in USD/MWh |
+| `avgEnergyRevenue` | Required | `number` | - | Average revenue per unit of energy, shown in USD/MWh |
+| `avgOperationsCost` | Required | `number` | - | Average operational (non-energy) cost, shown in USD/MWh |
+| `avgPowerAvailability` | Required | `number` | - | Available site power passed in as `availablePowerMW`, in MW |
+| `avgPowerConsumption` | Required | `number` | - | Mean site power draw across the periods, in MW |
+
+### `EnergyRevenueMetrics`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `curtailmentRate` | Required | `number` | - | Average curtailment rate over the range, as a percentage (0-100) |
+| `operationalIssuesRate` | Required | `number` | - | Average rate of downtime from operational issues over the range, as a percentage (0-100) |
 <!-- END GENERATED: props -->
 
 ## Typical usage with `useEnergyBalanceViewModel`

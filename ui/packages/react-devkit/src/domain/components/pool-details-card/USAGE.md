@@ -12,6 +12,13 @@ available" placeholder.
 | `className` | Optional | `string` | - | Additional class names |
 | `label` | Optional | `string` | - | Header label |
 | `underline` | Optional | `boolean` | `false` | Render an underline under the label |
+
+### `PoolDetailItem`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `title` | Required | `string` | - | Row label, rendered with a trailing colon |
+| `value` | Optional | `string \| number` | - | Row value; renders `-` when undefined or an empty string |
 <!-- END GENERATED: props -->
 
 ## Example

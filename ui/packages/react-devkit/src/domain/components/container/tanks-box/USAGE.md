@@ -12,7 +12,7 @@
 | `color` | Required | `string` | - | CSS colour for the temperature value (threshold-driven) |
 | `label` | Required | `string` | - | Tank identifier label (e.g. "Tank 1") |
 | `oilPumpEnabled` | Required | `boolean` | - | Running state for the oil pump |
-| `pressure` | Required | `Partial<{ value: number; flash: boolean; color: string; tooltip: string; }>` | - | Pressure reading with optional flash/colour/tooltip |
+| `pressure` | Required | `Partial<{ value: number; flash: boolean; color: string; tooltip: string }>` | - | Pressure reading with optional flash/colour/tooltip |
 | `temperature` | Required | `number` | - | Current temperature value |
 | `unit` | Required | `string` | - | Temperature unit string (e.g. "°C") |
 | `waterPumpEnabled` | Required | `boolean` | - | Running state for the water pump |
@@ -23,7 +23,7 @@
 
 | Prop | Status | Type / Options | Default | Description |
 |------|--------|----------------|---------|-------------|
-| `data` | Optional | `{ oil_pump: Tank[]; water_pump: WaterPump[]; pressure: TanksBoxPressure[]; }` | - | Tank telemetry arrays; returns `null` when omitted |
+| `data` | Optional | `{ oil_pump: Tank[]; water_pump: WaterPump[]; pressure: TanksBoxPressure[] }` | - | Tank telemetry arrays; returns `null` when omitted |
 <!-- END GENERATED: props -->
 
 ## Minimal example

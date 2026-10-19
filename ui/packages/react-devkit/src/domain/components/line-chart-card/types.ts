@@ -60,8 +60,11 @@ export type LineChartCardData = {
 }>
 
 export type TimelineOption = {
+  /** Timeline key (e.g. `5m`, `1h`) passed to `onTimelineChange` and matched against `timeline` */
   value: string
+  /** Range-selector button text */
   label: string
+  /** Not forwarded to the range selector; currently has no effect */
   disabled?: boolean
 }
 

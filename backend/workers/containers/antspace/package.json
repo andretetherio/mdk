@@ -1,6 +1,6 @@
 {
   "name": "@tetherto/mdk-worker-antspace",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "Container Antspace",
   "keywords": [
     "tether"
@@ -27,7 +27,7 @@
   "devDependencies": {
     "@bitfinex/lib-js-util-promise": "^1.1.0",
     "brittle": "3.16.3",
-    "fastify": "5.12.1",
+    "fastify": "5.12.5",
     "standard": "17.1.2",
     "yargs": "17.7.2"
   },

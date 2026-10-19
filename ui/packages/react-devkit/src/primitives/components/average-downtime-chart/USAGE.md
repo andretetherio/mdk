@@ -18,6 +18,14 @@ Stacked bar chart of Curtailment vs Op. Issues downtime rates. Includes
 | `title` | Optional | `string` | `"Monthly Average Downtime"` | Chart title (unit renders on its own line below) |
 | `unit` | Optional | `string` | `%` | Unit subtitle under the title |
 | `yTicksFormatter` | Optional | `(value: number) => string` | - | Formats Y-axis ticks, tooltips, and bar data labels (values are 0–1 rates). Defaults to rate × 100 via `formatNumber` |
+
+### `AverageDowntimeChartData`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `labels` | Required | `string[]` | - | X-axis period labels, one per bar; empty renders the empty state |
+| `curtailment` | Optional | `number[]` | - | "Curtailment" downtime rate per period, as a fraction (0–1), aligned to `labels` |
+| `operationalIssues` | Optional | `number[]` | - | "Op. Issues" downtime rate per period, as a fraction (0–1), stacked on `curtailment` |
 <!-- END GENERATED: props -->
 
 ## Example

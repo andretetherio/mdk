@@ -19,11 +19,13 @@ import {
 import './miners-activity-chart.scss'
 
 type MinersActivityData = {
+  /** Total miner count; not rendered, since each tile reads its own status key (e.g. `offline`, `error`, `sleep`) and shows 0 when absent */
   total?: number
   [key: string]: number | undefined
 }
 
 type MinerActivityChartErrorProp = {
+  /** Error payload; `message` becomes the error alert description when `isError` is set, else a generic retry hint */
   data?: { message?: string }
   [key: string]: unknown | null
 }

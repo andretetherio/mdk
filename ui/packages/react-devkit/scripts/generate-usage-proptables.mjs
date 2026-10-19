@@ -44,9 +44,9 @@ const escapePipes = text =>
 
 const fullText = item => item.descriptionFull || item.description || ''
 
-function renderTable(props) {
+function renderTable(props, firstColumn = 'Prop') {
   const lines = [
-    '| Prop | Status | Type / Options | Default | Description |',
+    `| ${firstColumn} | Status | Type / Options | Default | Description |`,
     '|------|--------|----------------|---------|-------------|',
   ]
   // Required props first, then optional, each group alphabetical by name.
@@ -64,6 +64,27 @@ function renderTable(props) {
   return lines.join('\n')
 }
 
+// Object types referenced by props (registry `shapes`), one table each, after
+// the props table(s). Same columns as the props table, first one named `Field`.
+// The registry lists shapes per component, so components sharing a USAGE.md
+// often reference the same type: render each name once per block. Two
+// different types with one name would need distinct headings — fail instead.
+function collectShapes(components) {
+  const byName = new Map()
+  for (const c of components) {
+    for (const s of c.shapes ?? []) {
+      const seen = byName.get(s.name)
+      if (!seen) byName.set(s.name, s)
+      else if (JSON.stringify(seen.fields) !== JSON.stringify(s.fields))
+        throw new Error(`shape \`${s.name}\` differs between components sharing one USAGE.md`)
+    }
+  }
+  return [...byName.values()]
+}
+
+const renderShapes = shapes =>
+  shapes.flatMap(s => ['', `### \`${s.name}\``, '', renderTable(s.fields, 'Field')])
+
 function renderBlock(components) {
   const parts = [BEGIN_MARKER, '## Props', '']
   if (components.length === 1) {
@@ -75,6 +96,7 @@ function renderBlock(components) {
     }
     parts.pop() // drop the trailing blank line inside the block
   }
+  parts.push(...renderShapes(collectShapes(components)))
   parts.push(END_MARKER)
   return parts.join('\n')
 }

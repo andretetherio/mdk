@@ -12,6 +12,7 @@ import { getPumpStatus, pumpStatusToIndicatorColor } from './bitmain-immersion-s
 import './bitmain-immersion-summary-box.scss'
 
 export type BitMainImmersionSummaryBoxContainerSettings = {
+  /** Container threshold config from the API; `oilTemperature` (`criticalLow`, `alert`, `normal`, `alarm`, `criticalHigh`) sets the supply-temperature colors and flashing, otherwise built-in defaults apply */
   thresholds?: Record<string, unknown>
 }
 

@@ -2,9 +2,13 @@ import type { FormSelectOption } from '@primitives'
 
 /** A spare part shown in the batch-move table. */
 export type BatchMoveSparePart = {
+  /** Part identifier; not rendered, kept so the caller can map the move back to its records */
   id: string
+  /** Part code, shown in the Code column */
   code: string
+  /** Current location value; shown as the matching `locationOptions` label, or the raw value when none matches */
   location: string
+  /** Current status value; shown as the matching `statusOptions` label, or the raw value when none matches */
   status: string
 }
 

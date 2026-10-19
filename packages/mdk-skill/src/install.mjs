@@ -8,16 +8,8 @@
 
 import fs from 'node:fs'
 import path from 'node:path'
+import { parseArgs } from 'node:util'
 import { installSkills } from './index.mjs'
-
-function parseArgs (argv) {
-  const args = { client: 'all', target: null }
-  for (let i = 0; i < argv.length; i++) {
-    if (argv[i] === '--client') args.client = argv[++i]
-    else if (argv[i] === '--target') args.target = argv[++i]
-  }
-  return args
-}
 
 function findProjectRoot (startDir) {
   let dir = startDir
@@ -29,13 +21,34 @@ function findProjectRoot (startDir) {
   }
 }
 
-const { client, target } = parseArgs(process.argv.slice(2))
+const USAGE = 'usage: node src/install.mjs [--client cursor|claude|all] [--target <project-root>]'
+
+let values
+try {
+  ({ values } = parseArgs({
+    options: {
+      client: { type: 'string', default: 'all' },
+      target: { type: 'string' },
+      help: { type: 'boolean', short: 'h' }
+    }
+  }))
+} catch (err) {
+  console.error(`ERR_ARGS: ${err.message}\n${USAGE}`)
+  process.exit(2)
+}
+if (values.help) {
+  console.log(USAGE)
+  process.exit(0)
+}
+
+const { client, target } = values
 const projectRoot = target ? path.resolve(process.cwd(), target) : findProjectRoot(process.cwd())
 
 try {
   const { skills, installed } = installSkills({ client, target: projectRoot })
-  for (const { dir } of installed) {
+  for (const { dir, removed } of installed) {
     console.log(`installed ${skills.length} skill(s) -> ${path.relative(process.cwd(), dir) || '.'}`)
+    if (removed.length) console.log(`removed ${removed.length} stale skill(s): ${removed.join(', ')}`)
   }
   console.log('done — installed skill dirs are generated artifacts; keep them gitignored')
 } catch (err) {

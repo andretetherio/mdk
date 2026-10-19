@@ -13,8 +13,11 @@ export type AlarmItemData = {
 }
 
 export type TimelineItemData = {
+  /** The alarm rendered by the row: `title`, `subtitle`, `body` (split on `|` into lines), `status` (`Critical`, `High` or `Medium` sets the color and icon) and `uuid` (click target `/alerts/<uuid>`) */
   item: AlarmItemData
+  /** Timeline marker (e.g. `LogDot`), set by `getAlertTimelineItems`; not rendered by `AlarmRow` */
   dot: ReactNode
+  /** Prebuilt `LogItem` node, set by `getAlertTimelineItems`; not rendered by `AlarmRow` */
   children: ReactNode
 }
 

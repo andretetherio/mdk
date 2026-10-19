@@ -13,6 +13,21 @@ Values are automatically displayed in BTC when averages exceed 1 BTC, or convert
 | `legendAlign` | Optional | `"center" \| "start" \| "end"` | `"start"` | Chart legend alignment |
 | `legendPosition` | Optional | `"left" \| "right" \| "top" \| "bottom"` | `"bottom"` | Chart legend position |
 | `siteList` | Optional | `(string \| SiteItem)[]` | `[]` | List to resolve site IDs to display names |
+
+### `RevenueDataItem`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `period` | Required | `string` | - | Period granularity (e.g. `monthly`); reserved so it is not read as a site key, not used by the chart |
+| `timeKey` | Required | `string` | - | Period label (e.g. `Jan 2024`); becomes the x-axis category for the period's bars |
+| `timestamp` | Required | `number` | - | Period timestamp (ms epoch); reserved so it is not read as a site key, not used by the chart |
+
+### `SiteItem`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `id` | Required | `string` | - | Site ID, matched case-insensitively against the site keys in each `RevenueDataItem` |
+| `name` | Optional | `string` | - | Legend label for the site; the capitalised `id` is used when omitted |
 <!-- END GENERATED: props -->
 
 ## When to use

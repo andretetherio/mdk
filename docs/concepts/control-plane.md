@@ -47,6 +47,9 @@ Kernel compares the caller's key with the allowlist. An empty allowlist admits a
 admits the approved callers. This transport-level check works the same way whether the processes share a host or
 when they communicate across a network.
 
+The Gateway dials with one persistent key, derived from a seed kept in its store and published as `status.rpcClientKey` in its
+status file (`<root>/status/wrk-node-http-<port>.json`). That is the [value to allowlist][mcp-allowlist], and it survives restarts.
+
 Transport identity is not user identity. The HRPC allowlist controls which backend processes may connect to Kernel, and it says nothing about the
 person or agent behind a request. Establishing that is the job of the plugin controllers serving people, browser applications, and agents.
 
@@ -200,12 +203,12 @@ The write-action flow is reachable from two different layers depending on where 
 > [!IMPORTANT]
 > The React hooks go through the Gateway, so whatever validation your plugin controllers perform applies to them. The `mdk-client` methods connect
 > directly to Kernel and bypass that layer entirely. Neither path gets user-level control for free: the Gateway ships no authentication, and Kernel
-> admits backend processes according to its HRPC transport policy, where an empty allowlist admits any caller and a configured allowlist admits
-> matching caller keys.
+> admits backend processes by its [HRPC transport policy](#transport-identity-and-admission).
 
 ## Next steps
 
 - Build Gateway routes with the [plugin guide][plugins-how-to]
+- Secure a production site with the [security blueprint][security-blueprint]
 - Submit and approve write actions with the [write-actions how-to][write-actions-how-to]
 - Review the [Kernel modules][kernel-readme]
 - Review Worker capabilities in the [Worker README][worker-readme]
@@ -246,4 +249,7 @@ The write-action flow is reachable from two different layers depending on where 
 
 [mcp-allowlist]: ../guides/security/index.md#step-2-admit-the-gateway-to-kernel
 <!-- docs@tether.io: mcp-allowlist → guides/security#step-2-admit-the-gateway-to-kernel -->
+
+[security-blueprint]: ../guides/security/index.md
+<!-- docs@tether.io: security-blueprint → guides/security -->
 <!-- docs@tether.io: hrpc-glossary → reference/glossary#hyperswarm-rpc -->
