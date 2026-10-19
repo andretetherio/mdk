@@ -19,6 +19,13 @@ an embedded `DateRangePicker`.
 | `className` | Optional | `string` | - | Additional class names |
 | `isLoading` | Optional | `boolean` | `false` | Show DataTable loading overlay |
 | `onAlertClick` | Optional | `((id?: string \| undefined, uuid?: string \| undefined) => void)` | - | Called when the user opens an alert |
+
+### `HistoricalAlertsRange`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `end` | Required | `number` | - | Range end, epoch ms; seeds the picker's `to` date |
+| `start` | Required | `number` | - | Range start, epoch ms; seeds the picker's `from` date |
 <!-- END GENERATED: props -->
 
 ## Minimal example

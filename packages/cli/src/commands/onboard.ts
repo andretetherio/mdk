@@ -405,6 +405,7 @@ async function runOnboard(): Promise<void> {
     if (result.ok) {
       sk.stop(`${tick} Developer Skill installed`);
       if (result.message) log.message(theme.muted(result.message));
+      if (result.detail) log.message(theme.muted(result.detail));
     } else {
       sk.stop(theme.warn(`Skill install skipped: ${result.message}`));
       if (result.detail) log.message(theme.muted(result.detail));

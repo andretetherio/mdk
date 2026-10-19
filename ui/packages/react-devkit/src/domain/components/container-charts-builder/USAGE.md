@@ -7,7 +7,7 @@ entries and renders a `LineChart` inside a `ChartContainer`.
 
 ## Props detail
 
-| Prop                | Status   | Type                      | Default      | Description                                                      |
+| Prop                | Status   | Type / Options | Default      | Description                                                      |
 | ------------------- | -------- | ------------------------- | ------------ | ---------------------------------------------------------------- |
 | `tag`               | Optional | `string`                  | —            | Container tag (any leading prefix is stripped)                   |
 | `chartDataPayload`  | Optional | `ChartDataPayload`        | —            | Declarative chart configuration                                  |

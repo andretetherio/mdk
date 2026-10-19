@@ -77,7 +77,7 @@ const kernel = await getKernel()
 
 | Option | Status | Type | Default | Description |
 | --- | --- | --- | --- | --- |
-| `opts.root` | Optional | `string` | `os.tmpdir()/mdk` | Data root directory |
+| `opts.root` | Optional | `string` | `~/.mdk` | Data root directory |
 | `opts.storeDir` | Optional | `string` | Under `opts.root` | Override Hyperbee store path |
 | `opts.discovery` | Optional | `object` | DHT mode | Discovery config: `{ mode: 'dht' \| 'local', dir? }` |
 | `opts.topic` | Optional | `string` | Read from `opts.topicFile` if it exists, else a fresh random topic (not persisted) | 32-byte hex DHT topic; overrides the topic file |
@@ -130,7 +130,7 @@ const server = await startGateway({
 
 | Option | Status | Type | Default | Description |
 | --- | --- | --- | --- | --- |
-| `opts.root` | Optional | `string` | `os.tmpdir()/mdk/gateway` | Config/data root |
+| `opts.root` | Optional | `string` | `~/.mdk/gateway` | Config/data root |
 | `opts.port` | Optional | `number` | `3000` | HTTP port |
 | `opts.env` | Optional | `string` | `'development'` | Environment string |
 | `opts.kernel` | Optional, one of `opts.kernel`/`opts.kernelKey`/`opts.keyFile` must resolve a key | `KernelManager` | None | Kernel instance; Gateway stop is registered on cleanup. Its `getPublicKey()` also resolves the Kernel key. |
@@ -228,8 +228,8 @@ order services were started.
 
 ```js
 const { DEFAULT_TOPIC_FILE, DEFAULT_KEY_FILE } = require('@tetherto/mdk-core')
-// DEFAULT_TOPIC_FILE — os.tmpdir()/mdk/.dht-topic
-// DEFAULT_KEY_FILE   — os.tmpdir()/mdk/.kernel-key (Kernel HRPC public key, hex)
+// DEFAULT_TOPIC_FILE — ~/.mdk/.dht-topic
+// DEFAULT_KEY_FILE   — ~/.mdk/.kernel-key (Kernel HRPC public key, hex)
 ```
 
 ## Single-process full stack

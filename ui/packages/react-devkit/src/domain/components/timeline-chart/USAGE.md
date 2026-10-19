@@ -16,6 +16,27 @@ legend. Supports streaming updates via `newData`.
 | `range` | Optional | `ChartRange` | - | Visible time window |
 | `skipUpdates` | Optional | `boolean` | `false` | Ignore `newData` |
 | `title` | Optional | `string` | - | Chart title |
+
+### `TimelineChartData`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `datasets` | Required | `TimelineChartDataset[]` | - | Bar series; each dataset's `label` is its tooltip title and legend entry |
+| `labels` | Required | `string[]` | - | Row labels, one row each; a data point lands in the row whose label equals its `y`. Nothing renders when empty |
+
+### `ChartRange`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `max` | Required | `number \| Date` | - | Right edge of the time axis (`Date` or epoch ms) |
+| `min` | Required | `number \| Date` | - | Left edge of the time axis (`Date` or epoch ms); without a range the axis spans the data |
+
+### `AxisTitleText`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `x` | Required | `string` | - | Title under the time axis; hidden when empty |
+| `y` | Required | `string` | - | Title beside the row labels; hidden when empty |
 <!-- END GENERATED: props -->
 
 ## Example

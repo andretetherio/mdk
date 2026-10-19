@@ -18,6 +18,20 @@ Multi-series time-series chart panel used by container detail views to display t
 | `onSelectedCombinationChange` | Optional | `((value: string \| null) => void)` | - | Called when the selected combination changes |
 | `selectedCombination` | Optional | `string \| null` | - | Controlled selected combination value |
 | `title` | Optional | `string` | `"Container Charts"` | Section heading |
+
+### `ContainerChartCombinationOption`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `label` | Required | `string` | - | Option text in the combination selector |
+| `value` | Required | `string` | - | Selection value; matched against the container type/model (e.g. Bitdeer, MicroBT, Antspace) to pick which charts render |
+
+### `ChartEntry`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `container_specific_stats_group_aggr` | Required | `Record<string, EntryData \| null \| undefined>` | - | Per-device readings keyed by device name; each value maps a stat key (e.g. `cold_temp_c_1_group`) to its reading, and `null`/missing devices are skipped |
+| `ts` | Required | `string \| number` | - | Sample timestamp (epoch ms), used as the x value; entries are expected oldest first |
 <!-- END GENERATED: props -->
 
 ## Minimal example

@@ -17,7 +17,9 @@ const DEFAULT_SORTING: DataTableSortingState = [
 ]
 
 export type HistoricalAlertsRange = {
+  /** Range start, epoch ms; seeds the picker's `from` date */
   start: number
+  /** Range end, epoch ms; seeds the picker's `to` date */
   end: number
 }
 

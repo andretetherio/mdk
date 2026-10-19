@@ -7,9 +7,9 @@ Individual chip tile inside `MinerChipsCard`. Shows the slot index, current freq
 
 | Prop | Status | Type / Options | Default | Description |
 |------|--------|----------------|---------|-------------|
-| `frequency` | Required | `{ current: number; }` | - | Current frequency in MHz |
+| `frequency` | Required | `{ current: number }` | - | Current frequency in MHz |
 | `index` | Required | `number` | - | Chip slot index |
-| `temperature` | Required | `{ avg: number; min: number; max: number; }` | - | Temperature readings in °C |
+| `temperature` | Required | `{ avg: number; min: number; max: number }` | - | Temperature readings in °C |
 <!-- END GENERATED: props -->
 
 ## Minimal example

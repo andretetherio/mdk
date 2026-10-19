@@ -1,6 +1,8 @@
 /** The spare part targeted for deletion. */
 export type ConfirmDeleteSparePartModalSparePart = {
+  /** Part identifier; not rendered, passed back to `onConfirm` with the part */
   id: string
+  /** Part code, quoted in the confirmation message */
   code: string
 }
 

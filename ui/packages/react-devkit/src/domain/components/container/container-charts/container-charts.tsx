@@ -22,7 +22,9 @@ import type { ChartEntry } from './container-charts.types'
 import './container-charts.scss'
 
 export type ContainerChartCombinationOption = {
+  /** Selection value; matched against the container type/model (e.g. Bitdeer, MicroBT, Antspace) to pick which charts render */
   value: string
+  /** Option text in the combination selector */
   label: string
 }
 

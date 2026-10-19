@@ -9,7 +9,7 @@ A generic card container with a header label, optional navigation link, and conf
 |------|--------|----------------|---------|-------------|
 | `children` | Optional | `React.ReactNode` | - | Card body content |
 | `className` | Optional | `string` | - | Additional class for the root element |
-| `getNavigateOptions` | Optional | `(label: string) => Partial<{ href: string; target: string; }>` | - | Returns a link `href`/`target` for the label when provided |
+| `getNavigateOptions` | Optional | `(label: string) => Partial<{ href: string; target: string }>` | - | Returns a link `href`/`target` for the label when provided |
 | `hasNoBorder` | Optional | `boolean` | `false` | Removes the card border |
 | `hasNoMargin` | Optional | `boolean` | `false` | Removes default margin |
 | `hasNoWrap` | Optional | `boolean` | `false` | Prevents content from wrapping |

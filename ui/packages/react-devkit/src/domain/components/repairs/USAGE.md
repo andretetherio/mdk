@@ -11,7 +11,7 @@ removed. It renders a non-paginated `DataTable`.
 | Prop | Status | Type / Options | Default | Description |
 |------|--------|----------------|---------|-------------|
 | `batchAction` | Required | `object` | - | The repair batch action whose part changes should be displayed |
-| `devices` | Required | `Partial<{ id: string; rack: string; info: Partial<{ serialNum: string; macAddress: string; }>; }>[]` | - | Devices referenced by the batch action, pre-fetched by the parent |
+| `devices` | Required | `Partial<{ id: string; rack: string; info: Partial<{ serialNum: string; macAddress: string }> }>[]` | - | Devices referenced by the batch action, pre-fetched by the parent |
 | `isLoading` | Optional | `boolean` | `false` | Show a spinner while the parent is still fetching `devices` |
 <!-- END GENERATED: props -->
 

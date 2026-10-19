@@ -16,6 +16,22 @@ describe('installSkill', () => {
     expect(result).toEqual({ ok: true, message: 'Installed 2 skill(s) for cursor, claude.' });
   });
 
+  it('surfaces swept stale skills as detail', () => {
+    installSkillsMock.mockReturnValue({
+      skills: ['mdk'],
+      installed: [
+        { client: 'cursor', removed: ['mdk-old'] },
+        { client: 'claude', removed: ['mdk-old'] },
+      ],
+    });
+    const result = installSkill('all', '/tmp/project');
+    expect(result).toEqual({
+      ok: true,
+      message: 'Installed 1 skill(s) for cursor, claude.',
+      detail: 'Removed 1 stale skill(s): mdk-old.',
+    });
+  });
+
   it('reports failure with the error message', () => {
     installSkillsMock.mockImplementation(() => {
       throw new Error('disk full');

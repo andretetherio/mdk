@@ -14,23 +14,19 @@ A button that requires confirmation before executing an action. The confirmation
 | `loading` | Optional | `boolean` | - | Shows a spinner on the trigger button |
 | `mode` | Optional | `"dialog" \| "popover"` | `"popover"` | Confirmation mode: popover (inline) or dialog (modal) |
 | `variant` | Optional | `"primary" \| "danger" \| "secondary"` | `"secondary"` | Visual style of the trigger button |
-<!-- END GENERATED: props -->
-
-## Props detail
-
-> **Props are generated from this component's TypeScript types, the source of truth.** The following are supplementary (object-prop shapes, allowed values, or passthrough props), not the full prop list.
 
 ### `ActionButtonConfirmation`
 
-| Prop           | Status   | Type              | Default                     | Description                                          |
-| -------------- | -------- | ----------------- | --------------------------- | ---------------------------------------------------- |
-| `title`        | Required | `string`          | —                           | Heading shown in the confirmation UI                 |
-| `description`  | Optional | `React.ReactNode` | —                           | Body text or node shown below the title              |
-| `icon`         | Optional | `React.ReactNode` | `<QuestionMarkCircledIcon>` | Icon shown in the popover header (popover mode only) |
-| `confirmLabel` | Optional | `string`          | `'OK'` / `'Confirm'`        | Label for the confirm button                         |
-| `cancelLabel`  | Optional | `string`          | `'Cancel'`                  | Label for the cancel button                          |
-| `onConfirm`    | Optional | `VoidFunction`    | —                           | Fired when the user confirms                         |
-| `onCancel`     | Optional | `VoidFunction`    | —                           | Fired when the user cancels                          |
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `title` | Required | `string` | - | Heading shown in the confirmation UI |
+| `cancelLabel` | Optional | `string` | `"Cancel"` | Label for the cancel button |
+| `confirmLabel` | Optional | `string` | `'OK' (popover) / 'Confirm' (dialog)` | Label for the confirm button. Defaults to `'OK'` in popover mode and `'Confirm'` in dialog mode |
+| `description` | Optional | `React.ReactNode` | - | Body text or node shown below the title |
+| `icon` | Optional | `React.ReactNode` | `<QuestionMarkCircledIcon>` | Icon shown in the popover header (popover mode only) |
+| `onCancel` | Optional | `VoidFunction` | - | Fired when the user cancels |
+| `onConfirm` | Optional | `VoidFunction` | - | Fired when the user confirms |
+<!-- END GENERATED: props -->
 
 ## Example
 

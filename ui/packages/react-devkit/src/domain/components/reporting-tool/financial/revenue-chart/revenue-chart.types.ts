@@ -2,15 +2,20 @@ import type { Position } from '@primitives'
 
 /** A single time-period revenue record; reserved keys plus one numeric value per site ID. */
 export type RevenueDataItem = {
+  /** Period label (e.g. `Jan 2024`); becomes the x-axis category for the period's bars */
   timeKey: string
+  /** Period granularity (e.g. `monthly`); reserved so it is not read as a site key, not used by the chart */
   period: string
+  /** Period timestamp (ms epoch); reserved so it is not read as a site key, not used by the chart */
   timestamp: number
   [key: string]: unknown
 }
 
 /** A site reference used to resolve site IDs in the data to display names. */
 export type SiteItem = {
+  /** Site ID, matched case-insensitively against the site keys in each `RevenueDataItem` */
   id: string
+  /** Legend label for the site; the capitalised `id` is used when omitted */
   name?: string
 }
 

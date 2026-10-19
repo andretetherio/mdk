@@ -97,9 +97,13 @@ export type EnergyReportBarViewProps = {
 }
 
 export type EnergyReportGroupedBarViewProps = {
+  /** Shows the chart's loading state and suppresses the empty state */
   isLoading?: boolean
+  /** Containers used to turn container keys into display names (miner-unit view only) */
   containers?: Container[]
+  /** Consumption grouped by miner model or container; bars come from the last `log` entry's `powerW`, shown in MW */
   groupedConsumption?: MetricsConsumptionGroupedResponse
+  /** Called with the selected start and end dates on mount and whenever the time-frame selector changes them */
   onTimeFrameChange?: EnergyReportBarViewProps['onTimeFrameChange']
 }
 

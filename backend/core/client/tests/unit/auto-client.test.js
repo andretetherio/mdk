@@ -65,6 +65,36 @@ test('auto client - failed connect resets so the next request retries', async (t
   t.is(transport.attempts, 2, 'one retry, not a permanent failure')
 })
 
+test('auto client - a failed Kernel request rejects with the error code, then recovers', async (t) => {
+  const channelClosed = Object.assign(new Error('channel closed'), { code: 'CHANNEL_CLOSED' })
+  let down = true
+  const transport = {
+    connect: async () => {},
+    close: async () => {},
+    request: async () => { if (down) throw channelClosed; return { workers: [] } }
+  }
+  const mdkClient = createMdkClient({}, { transport, errorCode: 'ERR_KERNEL_CLIENT_NOT_CONNECTED' })
+
+  try {
+    await mdkClient.listWorkers()
+    t.fail('request to an unreachable Kernel should have rejected')
+  } catch (err) {
+    t.is(err.code, 'ERR_KERNEL_CLIENT_NOT_CONNECTED', 'configured code on .code')
+    t.is(err.message, 'ERR_KERNEL_CLIENT_NOT_CONNECTED: channel closed', 'code prefixes the cause')
+    t.is(err.cause, channelClosed, 'transport error kept as the cause')
+  }
+
+  down = false
+  t.alike(await mdkClient.listWorkers(), { workers: [] }, 'next request succeeds once the Kernel is back')
+
+  try {
+    await mdkClient.sendWorkerCommand('w1', 'dev-1', 'reboot')
+    t.fail('unknown worker should have rejected')
+  } catch (err) {
+    t.is(err.message, 'ERR_MDK_WORKER_KEY_UNKNOWN', 'client ERR_ codes pass through unwrapped')
+  }
+})
+
 test('auto client - unknown method rejects with a named error', async (t) => {
   const mdkClient = createMdkClient({}, { transport: flakyTransport(0) })
   try {

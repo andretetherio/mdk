@@ -218,7 +218,15 @@ requests and has to find a conversation again between them, so history lives in 
 store** behind an interface a Redis or SQL implementation can satisfy.
 
 ```js
-const agent = await createAgent({ provider, mcp, store })   // store is optional
+const agent = await createAgent({
+  provider,          // required: QVAC or hosted provider
+  mcp,               // optional: { url } of Streamable HTTP MCP server
+  charter,           // optional: custom standing instructions (alias: system)
+  charterVersion,    // optional: version stamp (default 'v2', or 'custom' for overrides)
+  strictToolGating,  // optional: small-model gating; default true (false admits standard MCP tools)
+  capability,        // optional: 'small' | 'mid' | 'large' (default 'small', or 'mid' when strictToolGating: false)
+  store              // optional: default MemorySessionStore
+})
 
 const session = await agent.createSession({ userId, metadata })
 const resumed = await agent.resumeSession(id, { userId })   // null if gone, expired, or not theirs
@@ -228,6 +236,9 @@ Nothing is required to use it. Left out, the agent creates a `MemorySessionStore
 one process and no use beyond it: a restart loses every conversation, and two instances share
 none. The CLI needs no configuration and works as before, with one visible change: a session id
 is now a uuid rather than `sess_001`, and that is printed at startup and in `/info`.
+
+Set `charter` to override the built-in standing instructions; it must be a non-empty string when
+set, and omitting it keeps the built-in charter.
 
 **`resumeSession` requires the `userId` of whoever is asking, and there is no default.** A
 session id travels in URLs an operator can see, so an id alone is not authority to read the

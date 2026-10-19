@@ -18,10 +18,11 @@ export function installSkill(client: SkillClient, targetDir: string): SkillResul
   try {
     const result = installSkills({ client, target: targetDir });
     const clients = result.installed.map((entry) => entry.client).join(', ');
-    return {
-      ok: true,
-      message: `Installed ${result.skills.length} skill(s) for ${clients}.`,
-    };
+    const removed = [...new Set(result.installed.flatMap((entry) => entry.removed ?? []))];
+    const message = `Installed ${result.skills.length} skill(s) for ${clients}.`;
+    return removed.length
+      ? { ok: true, message, detail: `Removed ${removed.length} stale skill(s): ${removed.join(', ')}.` }
+      : { ok: true, message };
   } catch (error) {
     return { ok: false, message: error instanceof Error ? error.message : String(error) };
   }

@@ -13,11 +13,17 @@ type Month = {
 }
 
 type Week = {
+  /** Monday 00:00:00.000 (local time) that opens the week */
   start: Date
+  /** Sunday 23:59:59.999 (local time) that closes the week, capped to the end of yesterday */
   end: Date
+  /** Option text, `DD/MM - DD/MM` in the selected timezone */
   label: string
+  /** Year of the week's end date in the selected timezone; sent as `year` to `onRangeChange` */
   bucketYear: number
+  /** Month (0-11) of the week's end date in the selected timezone; sent as `month` to `onRangeChange` */
   bucketMonth: number
+  /** True when the week starts after the end of yesterday; the option is shown but not selectable */
   disabled?: boolean
 }
 

@@ -27,7 +27,7 @@ Form primitives built on react-hook-form. Use with a `useForm()` instance.
 
 | Prop | Status | Type / Options | Default | Description |
 |------|--------|----------------|---------|-------------|
-| `checkboxProps` | Optional | `({ checked?: CheckedState \| undefined; defaultChecked?: CheckedState \| undefined; disabled?: boolean \| undefined; size?: CheckboxSize \| undefined; color?: ComponentColor \| undefined; radius?: BorderRadius \| undefined; className?: string \| u… /* see source */` | - | - |
+| `checkboxProps` | Optional | `({ checked?: CheckedState; defaultChecked?: CheckedState; disabled?: boolean; size?: CheckboxSize; color?: ComponentColor; radius?: BorderRadius; className?: string; indicatorClassName?: string; onCheckedChange?: ((checked: CheckedState) =>… /* see source */` | - | - |
 | `description` | Optional | `string` | - | - |
 | `label` | Optional | `string` | - | - |
 | `layout` | Optional | `"row" \| "column"` | - | - |
@@ -110,6 +110,22 @@ Form primitives built on react-hook-form. Use with a `useForm()` instance.
 | `label` | Optional | `string` | - | - |
 | `placeholder` | Optional | `string` | - | - |
 | `textAreaProps` | Optional | `(Omit<TextAreaProps, "ref"> & React.RefAttributes<HTMLTextAreaElement>)` | - | - |
+
+### `FormRadioOption`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `label` | Required | `string` | - | Text of the radio's `<label>` |
+| `value` | Required | `string` | - | Value written to the form field when chosen; also the React key and part of the input `id`, so keep it unique |
+| `disabled` | Optional | `boolean` | - | Shows the radio but prevents choosing it |
+
+### `FormSelectOption`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `label` | Required | `string` | - | Text shown in the dropdown |
+| `value` | Required | `string` | - | Value written to the form field when chosen; also the React key, so keep it unique |
+| `disabled` | Optional | `boolean` | - | Shows the option but prevents choosing it |
 <!-- END GENERATED: props -->
 
 ## Pieces

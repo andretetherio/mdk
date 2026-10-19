@@ -270,6 +270,8 @@ async function runEval () {
       reps,
       tools,
       system: agent.system,
+      charterVersion: agent.charterVersion,
+      strictToolGating: agent.strictToolGating,
       startedAt,
       finishedAt: new Date().toISOString()
     })

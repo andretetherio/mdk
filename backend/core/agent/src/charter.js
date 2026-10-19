@@ -10,6 +10,24 @@
 export const CHARTER_VERSION = 'v2'
 
 /**
+ * Default fallback version stamp for a custom or unversioned standing instruction.
+ */
+export const CHARTER_VERSION_CUSTOM = 'custom'
+
+/**
+ * Identify the charter version for a given system prompt.
+ *
+ * Returns CHARTER_VERSION when the system prompt matches CHARTER (or is nullish),
+ * and CHARTER_VERSION_CUSTOM for an override with no explicit version.
+ *
+ * @param {string|null|undefined} system
+ * @returns {string}
+ */
+export function charterVersionFor (system) {
+  return (system != null && system !== CHARTER) ? CHARTER_VERSION_CUSTOM : CHARTER_VERSION
+}
+
+/**
  * The charter — the agent's standing instruction, sent to the model as the system prompt on
  * every request.
  *

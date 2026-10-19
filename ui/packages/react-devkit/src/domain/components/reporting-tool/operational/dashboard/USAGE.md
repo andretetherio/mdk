@@ -20,6 +20,20 @@ fixtures) - the hook never fetches.
 | `efficiency` | Optional | `OperationalDashboardTrendInput` | - | Shaped site-efficiency trend |
 | `hashrate` | Optional | `OperationalDashboardTrendInput` | - | Shaped hashrate trend (`LineChartCardData`) |
 | `miners` | Optional | `OperationalDashboardMinersInput` | - | Shaped stacked miners-status data |
+
+### `OperationalDashboardTrendInput`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `data` | Optional | `LineChartCardData` | - | Line-chart payload from `useOperationsDashboard`; the card shows an empty state when it has no data |
+| `isLoading` | Optional | `boolean` | - | Shows the card's loading state and suppresses the empty state |
+
+### `OperationalDashboardMinersInput`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `data` | Optional | `MinersStatusChartData` | - | Stacked bar-chart labels and datasets; "No miners data available" shows when `datasets` is empty |
+| `isLoading` | Optional | `boolean` | - | Shows the card's loading state and suppresses the empty state |
 <!-- END GENERATED: props -->
 
 ## Props detail

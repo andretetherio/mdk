@@ -10,12 +10,19 @@ tab strip, a table of existing subtypes for the active type, and an inline add f
 |------|--------|----------------|---------|-------------|
 | `activePartTypeId` | Required | `string` | - | The selected part type (controlled by the parent) |
 | `isOpen` | Required | `boolean` | - | Whether the modal is open |
-| `onAddSubType` | Required | `(name: string) => Promise<void \| { error?: string \| undefined; }>` | - | Add handler; return `{ error }` to surface a field error |
+| `onAddSubType` | Required | `(name: string) => Promise<void \| { error?: string }>` | - | Add handler; return `{ error }` to surface a field error |
 | `onClose` | Required | `VoidFunction` | - | Called when the modal requests to close |
 | `onPartTypeChange` | Required | `(id: string) => void` | - | Called when the active tab changes (fetch that type's subtypes here) |
 | `partTypes` | Required | `SparePartSubTypesModalPartType[]` | - | Part-type tabs |
 | `subTypes` | Required | `string[]` | - | Subtype names for the active part type |
 | `isLoading` | Optional | `boolean` | - | Renders a loader instead of the body |
+
+### `SparePartSubTypesModalPartType`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `label` | Required | `string` | - | Tab text |
+| `value` | Required | `string` | - | Tab value; matched against `activePartTypeId` and passed to `onPartTypeChange` |
 <!-- END GENERATED: props -->
 
 ## When to use

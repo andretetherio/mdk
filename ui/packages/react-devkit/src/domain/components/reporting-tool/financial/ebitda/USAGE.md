@@ -43,6 +43,17 @@ Components for the EBITDA financial reporting section.
 |------|--------|----------------|---------|-------------|
 | `currentBTCPrice` | Required | `number` | - | - |
 | `metrics` | Required | `EbitdaDisplayMetrics` | - | - |
+
+### `EbitdaDisplayMetrics`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `actualEbitda` | Required | `number` | - | Realised EBITDA over the range, in USD; currently the same value as `ebitdaSellingBTC` |
+| `bitcoinPrice` | Required | `number` | - | Mean of the per-period BTC prices over the range, in USD; falls back to the current BTC price when the log is empty |
+| `bitcoinProduced` | Required | `number` | - | BTC mined over the range (API `totalRevenueBTC`), in BTC |
+| `bitcoinProductionCost` | Required | `number` | - | Average cost to produce one BTC over the range, in USD (API `avgBtcProductionCost`, 0 when unavailable) |
+| `ebitdaNotSellingBTC` | Required | `number` | - | EBITDA over the range assuming no mined BTC is sold (HODL), in USD (API `totalEbitdaHodl`) |
+| `ebitdaSellingBTC` | Required | `number` | - | EBITDA over the range assuming all mined BTC is sold, in USD (API `totalEbitdaSelling`) |
 <!-- END GENERATED: props -->
 
 ## Minimal example

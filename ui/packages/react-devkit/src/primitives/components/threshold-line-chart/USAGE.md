@@ -17,6 +17,13 @@ Includes `ChartContainer` chrome: title, legend with series toggle, and empty st
 | `title` | Optional | `string` | - | Chart title (unit appended when `unit` is set) |
 | `unit` | Optional | `string` | - | Shown in title and axis/tooltip formatting |
 | `yTicksFormatter` | Optional | `(value: number) => string` | - | Custom Y-axis tick labels |
+
+### `ThresholdLineChartData`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `series` | Required | `ThresholdLineChartSeries[]` | - | Data lines; points with a non-finite timestamp are dropped. All-zero values render the empty state |
+| `thresholds` | Optional | `ThresholdLineChartThreshold[]` | - | Horizontal reference lines at a fixed `value`, spanning every timestamp in `series` |
 <!-- END GENERATED: props -->
 
 ## Example

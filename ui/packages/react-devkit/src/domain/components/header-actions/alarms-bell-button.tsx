@@ -6,8 +6,11 @@ import './header-actions.scss'
 export type AlarmSeverity = 'critical' | 'high' | 'medium'
 
 export type AlarmsBellButtonCounts = {
+  /** Critical alarm count, shown as the top badge row; omit to hide the row */
   critical?: number
+  /** High alarm count, shown as the middle badge row; omit to hide the row */
   high?: number
+  /** Medium alarm count, shown as the bottom badge row; omit to hide the row */
   medium?: number
 }
 

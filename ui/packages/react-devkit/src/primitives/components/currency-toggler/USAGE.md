@@ -11,19 +11,15 @@ A segmented button control for switching between currency options. Each item can
 | `onChange` | Required | `(currency: string) => void` | - | Fired with the selected currency value when a button is clicked |
 | `value` | Required | `string` | - | Currently selected currency value |
 | `className` | Optional | `string` | - | Additional class for the root element |
-<!-- END GENERATED: props -->
-
-## Props detail
-
-> **Props are generated from this component's TypeScript types, the source of truth.** The following are supplementary (object-prop shapes, allowed values, or passthrough props), not the full prop list.
 
 ### `CurrencyItem`
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `value` | `string` | yes | Option value (used for selection) |
-| `label` | `string` | no | Display label (defaults to `value`) |
-| `disabled` | `boolean` | no | Disables this option |
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `value` | Required | `string` | - | Option value (used for selection) |
+| `disabled` | Optional | `boolean` | - | Disables this option |
+| `label` | Optional | `string` | - | Display label (defaults to `value`) |
+<!-- END GENERATED: props -->
 
 ## Example
 

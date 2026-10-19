@@ -79,6 +79,17 @@ export type PropMeta = {
   descriptionFull?: string
 }
 
+/**
+ * A locally declared object type referenced by a prop (e.g. `legendData:
+ * LegendItem[]` → `LegendItem`), expanded one level so the field docs are
+ * generated from the type instead of hand-kept in USAGE.md.
+ */
+export type ShapeMeta = {
+  name: string
+  /** Fields of the shape, in the same form as component props. */
+  fields: PropMeta[]
+}
+
 /** Metadata for a single exported component. */
 export type ComponentMeta = {
   name: string
@@ -115,6 +126,11 @@ export type ComponentMeta = {
   domainContext?: DomainContext
   /** Source-derived prop information. */
   props: PropMeta[]
+  /**
+   * Object types declared in this package and referenced by `props`, expanded
+   * one level. Only emitted when at least one prop references such a type.
+   */
+  shapes?: ShapeMeta[]
   /**
    * Paths (relative to the package root) of co-located `*.example.tsx` files.
    * Only emitted for `agent-ready` components.
@@ -227,8 +243,11 @@ export type RegistryManifest = {
  *
  * 2.1.0 - Added `types` array and related indexes for TypeScript type
  * extraction. Additive change; existing consumers can ignore the new field.
+ *
+ * 2.2.0 - Added optional `shapes` on components: locally declared object types
+ * referenced by props, expanded one level. Additive change.
  */
-export const REGISTRY_SCHEMA_VERSION = '2.1.0'
+export const REGISTRY_SCHEMA_VERSION = '2.2.0'
 
 // ─── Blueprints ─────────────────────────────────────────────────────────────
 

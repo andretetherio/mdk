@@ -10,6 +10,14 @@ Card showing primary and secondary statistics for a single miner: efficiency, ha
 | `primaryStats` | Optional | `StatItem[]` | - | Primary statistics (efficiency, hashrate, temperature, frequency, consumption) |
 | `secondaryStats` | Optional | `StatItem[]` | - | Secondary statistics to display in grid |
 | `showSecondaryStats` | Optional | `boolean` | `true` | Whether to show secondary stats section |
+
+### `StatItem`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `name` | Optional | `string` | - | In `primaryStats`, selects the slot and must be exactly 'Efficiency', 'Hash rate', 'Temperature', 'Frequency' or 'Consumption'; in `secondaryStats`, the label (and React key) |
+| `unit` | Optional | `string` | - | Unit appended after the value in `primaryStats`; ignored in `secondaryStats`, so fold it into `value` there |
+| `value` | Optional | `string \| number` | - | Displayed value; Efficiency only shows when it is a number |
 <!-- END GENERATED: props -->
 
 ## Minimal example

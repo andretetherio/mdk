@@ -35,6 +35,12 @@ you get title, legend, range selector, and loading / empty states for free.
 | `unit` | Optional | `string` | `""` | The unit to display with values |
 | `verticalLineLabelVisible` | Optional | `boolean` | - | Show vertical line at mouse position |
 | `yTicksFormatter` | Optional | `((value: number) => string)` | - | Callback to format ticks on y axis. If `priceFormatter` is given. It would be used instead |
+
+### `LineChartData`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `datasets` | Required | `LineDataset[]` | - | One line series per entry; `visible: false` hides a series without removing it |
 <!-- END GENERATED: props -->
 
 ## Example

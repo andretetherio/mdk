@@ -78,12 +78,15 @@ recovery is always driven by the next caller-initiated request.
 | Argument | Status | Type | Default | Description |
 |--------|--------|------|---------|-------------|
 | `config.kernelKey` | Required unless `opts.transport` is set | `string \| Buffer` | None | The Kernel listener's public key. Inside a Gateway plugin, pass the whole `config` from `require('@tetherto/mdk-gateway/plugin')` — this is already folded in. |
+| `config.kernelKeyPair` | Optional | `{ publicKey, secretKey } \| () => keyPair` | None | DHT keypair the client dials with, so the [Kernel allowlist](../kernel/README.md#transports) can name it. Inside a Gateway plugin it is folded in (the Gateway's persistent `status.rpcClientKey`); without it the caller key is random per process |
 | `config.kernelBootstrap` | Optional | `object` | None | HRPC bootstrap override, folded in the same way |
 | `opts.errorCode` | Optional | `string` | `'ERR_MDK_CLIENT_UNAVAILABLE'` | Overrides the rejection code every request-issuing method throws when there's no connection. Not validated against the [documented error codes](#errors): any string is accepted, since a Gateway plugin commonly passes its own code instead. |
 | `opts.transport` | Required unless `config.kernelKey` is set | `object` | None | Pre-built transport (`{ connect, close, request }`). Test seam — satisfies the `kernelKey` requirement instead. |
 
 A host booted without a reachable Kernel keeps its routes up and fails per request with `opts.errorCode`, rather than
-failing to boot.
+failing to boot. A request that fails without an `ERR_*` code is rejected as `opts.errorCode` (default
+`ERR_MDK_CLIENT_UNAVAILABLE`), keeping the original failure as the error's `cause`; an error that already carries an
+`ERR_*` code passes through unchanged.
 
 ### `createRawMdkClient(opts)` → client
 
@@ -94,7 +97,7 @@ ambient-config, auto-connecting form.
 
 | Option | Status | Type | Default | Description |
 |--------|--------|------|---------|-------------|
-| `opts.hrpc` | Required unless `opts.transport` is set | `object` | None | HRPC transport opts: `{ key, seed?, bootstrap?, dht?, rpc? }`. `key` is the Kernel listener **or** a Worker's RPC public key (hex string or Buffer) |
+| `opts.hrpc` | Required unless `opts.transport` is set | `object` | None | HRPC transport opts: `{ key, keyPair?, seed?, bootstrap?, dht?, rpc? }`. `key` is the Kernel listener **or** a Worker's RPC public key (hex string or Buffer); `keyPair` (a DHT keypair or a function returning one) pins the identity the client dials with, so the Kernel allowlist can name it |
 | `opts.transport` | Required unless `opts.hrpc` is set | `object` | None | Pre-built transport (`{ connect, close, request }`). Test seam — satisfies the `hrpc` requirement instead. |
 
 Throws one of the [documented error codes](#errors): `ERR_MDK_CLIENT_TRANSPORT_REQUIRED` or `ERR_MDK_CLIENT_HRPC_KEY_REQUIRED`.
@@ -324,7 +327,7 @@ Cancel one or more staged actions by ids. `opts`: `{ ids, voter }`.
 
 | Code | Fires when | Fix |
 | --- | --- | --- |
-| `ERR_MDK_CLIENT_UNAVAILABLE` | `createMdkClient`'s `config.kernelKey` is missing, or connecting failed | Supply `config.kernelKey` (or `opts.transport`), or check Kernel connectivity |
+| `ERR_MDK_CLIENT_UNAVAILABLE` | `createMdkClient`'s `config.kernelKey` is missing, connecting failed, or a request could not reach the Kernel | Supply `config.kernelKey` (or `opts.transport`), or check Kernel connectivity |
 | `ERR_MDK_CLIENT_TRANSPORT_REQUIRED` | `createRawMdkClient` called with neither `opts.hrpc` nor `opts.transport` | Pass one of them |
 | `ERR_MDK_CLIENT_HRPC_KEY_REQUIRED` | `createRawMdkClient({ hrpc: {...} })` called without `hrpc.key` | Pass the Kernel's or a Worker's public key as `hrpc.key` |
 | `ERR_MDK_CLIENT_NO_SUCH_METHOD` | A `createMdkClient` call resolves to a property that isn't a function on the raw client | Check the method name |
@@ -387,3 +390,4 @@ client/
 - [Understand the MDK Protocol and Kernel's role as the kernel](../../../docs/concepts/architecture.md)
 - [Full-site example](../../../examples/full-site/README.md) — see `createMdkClient` used end-to-end with Kernel and Workers
 - [`startGateway()` option reference](../mdk/README.md) — if you are wiring `mdk-client` into a custom Gateway
+- [Restrict Kernel callers](../../../docs/guides/security/index.md): the allowlist that names this keypair

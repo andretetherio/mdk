@@ -1,5 +1,5 @@
 import test from 'brittle'
-import { CHARTER } from '../../src/charter.js'
+import { CHARTER, CHARTER_VERSION, CHARTER_VERSION_CUSTOM } from '../../src/charter.js'
 import { AGENT_META_KEY } from '../../src/tools.js'
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -22,7 +22,7 @@ const base = {
 test('the manifest carries the versions a score is only meaningful against', (t) => {
   const m = buildManifest(base)
   t.is(m.contract, 'v2', 'the tool contract version is recorded')
-  t.is(m.charter, 'v2', 'the standard charter is recorded by version')
+  t.is(m.charter, CHARTER_VERSION, 'the standard charter is recorded by version')
   t.is(m.model, 'qwen3-4b')
   t.is(m.providerKind, 'qvac')
   t.is(m.capability, 'small')
@@ -31,8 +31,23 @@ test('the manifest carries the versions a score is only meaningful against', (t)
 })
 
 test('a custom system prompt is never stamped with the standard charter version', (t) => {
-  t.is(buildManifest({ ...base, system: CHARTER }).charter, 'v2', 'the standard charter is itself')
-  t.is(buildManifest({ ...base, system: 'you are a pirate' }).charter, 'custom')
+  t.is(buildManifest({ ...base, system: CHARTER }).charter, CHARTER_VERSION, 'the standard charter is itself')
+  t.is(buildManifest({ ...base, system: 'you are a pirate' }).charter, CHARTER_VERSION_CUSTOM)
+})
+
+test('the manifest pins the charter by hash and records the gating mode', (t) => {
+  const m = buildManifest(base)
+  t.is(m.charterSha256, sha256(CHARTER), 'the standard charter hashes to its own bytes')
+  t.is(m.charterVersion, 'v2', 'and carries the version it ran under')
+  t.is(m.strictToolGating, true, 'strict gating is the default stamp')
+
+  // A custom charter at a named version: the hash pins the exact text a score was taken under,
+  // which a version tag alone cannot — two different charters could both call themselves 'custom'.
+  const custom = buildManifest({ ...base, system: 'you are a pirate', strictToolGating: false, charterVersion: 'domain-v1' })
+  t.is(custom.charterSha256, sha256('you are a pirate'))
+  t.unlike(custom.charterSha256, m.charterSha256, 'two charters are distinguishable by hash')
+  t.is(custom.charterVersion, 'domain-v1', 'an explicit version is recorded verbatim')
+  t.is(custom.strictToolGating, false, 'relaxed gating is recorded, so a run states its own rules')
 })
 
 test('the endpoint is recorded as a hash, so an internal host cannot travel with the run', (t) => {

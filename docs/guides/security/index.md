@@ -61,8 +61,8 @@ networks you define:
 
 Pass the Kernel public key to a remote Gateway as `kernelKey`. Treat the DHT discovery topic as deployment configuration, not a
 credential: generate a site-specific topic, distribute it out of band, and do not reuse example or well-known values. Pair this
-shape with a non-empty Kernel allowlist in the next step. Without that allowlist, DHT makes Kernel reachable to any peer that has
-the topic and the listener key.
+shape with a non-empty [Kernel allowlist](#step-2-admit-the-gateway-to-kernel). Without it, DHT makes Kernel reachable to any peer
+that has the topic and the listener key.
 
 Do not pass [`@tetherto/mdk-client`](../../../backend/core/client/README.md) or Kernel keys into the browser. HTTP to the Gateway is the only operator path.
 
@@ -80,7 +80,7 @@ has a non-empty allowlist.
 | Option          | When to pick it        | Trade-off                                                                                        |
 | --------------- | ---------------------- | ------------------------------------------------------------------------------------------------ |
 | Empty allowlist | Local development only | Anyone with the Kernel public key can read telemetry and dispatch commands, skipping the Gateway |
-| Allowlist the Gateway DHT public key | Every real site | The key is stable across restarts (persisted seed); guard it like a production credential |
+| Allowlist the Gateway DHT public key | Every real site | The Gateway store holds that key's seed: guard it like a credential |
 | Allowlist Gateway plus extra backend clients | A second `mdk-client` service you trust (batch jobs, a second Gateway, the standalone MCP server) | Each extra key is a full Kernel principal. Review it like a production credential. |
 
 Suggested default: one persistent Gateway key pair, that hex public key only, on Kernel:
@@ -91,15 +91,16 @@ const kernel = await getKernel({
 })
 ```
 
-The [auth allowlist example][auth-whitelist] shows the exchange. Generate the Gateway key once, store it with the same care as a TLS
-key, and put it on the allowlist. The Gateway derives its key from a persisted seed, so it stays stable across restarts — no need to
-re-check after a bounce.
+The [auth-whitelist example][auth-whitelist] shows the exchange. The Gateway's [persistent caller key][control-plane-admission] is
+`status.rpcClientKey` in its status file: read that hex and put it on the allowlist. Treat the Gateway store with the same care as a
+TLS key, since a copy of it presents the Gateway's identity.
 
-The standalone MCP server (`mdk run mcp`) is a separate Kernel caller with its own persistent key. Add it to `auth.whitelist`
-alongside the Gateway, or its tools can't reach Kernel on a site with a non-empty allowlist.
+The standalone MCP server (`mdk run mcp`) is a separate Kernel caller. It hosts no DHT of its own, so its plugin clients dial with a
+random key per process unless its config passes a `kernelKeyPair`. On a site with a non-empty allowlist, give it a persistent keypair
+that way and add that public key to `auth.whitelist` alongside the Gateway's, or its tools can't reach Kernel.
 
 On separate hosts, pass Kernel's public key to the Gateway as `kernelKey`. Do not rely on the well-known key file
-(`<tmpdir>/mdk/.kernel-key`) across machines. Where that file still exists on the Kernel host, keep it mode `0600` on a directory you
+(`~/.mdk/.kernel-key`) across machines. Where that file still exists on the Kernel host, keep it mode `0600` on a directory you
 own; it is not deleted on shutdown. Do not expose Kernel's HRPC listener off the backend network.
 
 </Step>
@@ -265,11 +266,11 @@ include site topology and, if you are careless, secrets.
 | Option                                    | When to pick it | Trade-off                           |
 | ----------------------------------------- | --------------- | ----------------------------------- |
 | `SIGINT` / supervisor stop so WAL and cleanup run | Always | A `SIGKILL` can leave `.mdk-data` / `storeDir` unusable. The next boot may look healthy with zero Workers. |
-| Health check HTTP only (`GET /auth/site`) | Insufficient | The Gateway can keep serving HTTP after the Kernel channel closes (`CHANNEL_CLOSED`) and never reconnect |
+| Health check HTTP only (`GET /auth/site`) | Insufficient | The Gateway keeps serving HTTP while the Kernel is unreachable; Kernel-backed routes fail with `ERR_MDK_CLIENT_UNAVAILABLE` until it is back. |
 
 Suggested default:
 
-- Mode `0600` (or equivalent) on Kernel db, Worker `storeDir`, and key files. Encrypt at rest if the host requires it
+- Mode `0700` (or equivalent) on the Kernel db directory and Worker `storeDir`, and `0600` on seed and key files. Encrypt at rest if the host requires it.
 - Back up those directories as operational data, with the same access control as the live files
 - Rotate Kernel, Gateway, and Worker keys when staff leave or a host is rebuilt, and update the allowlist in the same change
 - Practice recovery from a wiped data directory before an incident
@@ -287,7 +288,7 @@ Suggested default:
 | Decision         | Suggested production choice    | Demo-only choice                              |
 | ---------------- | ------------------------------ | --------------------------------------------- |
 | Topology         | Microservices over DHT, three networks (operator / backend / devices) | Single process on loopback |
-| Kernel admission | Non-empty `auth.whitelist` with persistent Gateway and MCP keys | Empty allowlist |
+| Kernel admission | Non-empty `auth.whitelist` with the persistent Gateway key, plus a pinned MCP server key if you run one | Empty allowlist |
 | Worker access    | Backend network only, keys unpublished | Same host, unpublished anyway |
 | User identity    | Your SSO or JWTs, checked in every Gateway controller | No check, `noAuth()` |
 | Writes           | Approval-gated for fleet changes; Gateway sets `authPerms` | Direct `sendCommand` with no token |
@@ -311,6 +312,9 @@ Suggested default:
 
 [control-plane]: ../../concepts/control-plane.md
 <!-- docs@tether.io: control-plane → concepts/control-plane -->
+
+[control-plane-admission]: ../../concepts/control-plane.md#transport-identity-and-admission
+<!-- docs@tether.io: control-plane-admission → concepts/control-plane#transport-identity-and-admission -->
 
 [deployment-topologies]: ../../concepts/deployment-topologies.md
 <!-- docs@tether.io: deployment-topologies → concepts/deployment-topologies -->

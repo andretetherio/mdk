@@ -1,131 +1,94 @@
-# Changelog: mdk-0.10.0
+# Changelog: mdk-0.11.0
 
-> For a high-level introduction, see the [release notes](./docs/reference/release-notes/0.10.0-release.md)
+> For a high-level introduction, see the [release notes](./docs/reference/release-notes/0.11.0-release.md)
 
-## v0.10.0
+## v0.11.0
 
-- Moves MCP **out of the Gateway entirely**: the Gateway no longer hosts an MCP server or depends on `@tetherto/mdk-mcp`, and
-  the standalone MCP server turns a Gateway plugin's routes into tools by reading the plugin's own contract off disk
-- Adds **`mdk run mcp`** to the CLI, serving every Gateway plugin declared in `mdk.yaml` as MCP tools from a process of its own
-- Narrows **`@tetherto/mdk-agent`** to the four exports a consumer uses, behind an `exports` map
-- Closes two Gateway exposures: internal error messages no longer reach clients verbatim, and `?overwriteCache=true` is no
-  longer honored for anonymous callers
-- Renames the **Op Centre** UI exports to **Op Center**, a breaking change for the five exported constants and the `hooks.json` category
-- Adds a **generated reference page for the monorepo's packages**, with each one's purpose and whether it is publishable
+- Makes the **Kernel allowlist work for Gateway plugins**: every plugin's client now dials Kernel with the Gateway's persistent DHT
+  key, the one the Gateway publishes as `status.rpcClientKey`, so one allowlist entry admits the whole Gateway and survives restarts
+- Moves the **default data root from `os.tmpdir()/mdk` to `~/.mdk`**, created owner-only, so Kernel, Gateway and Worker identity
+  seeds no longer sit in a shared temp directory
+- Has `@tetherto/mdk-client` report a Kernel it cannot reach as **`ERR_MDK_CLIENT_UNAVAILABLE` on every request**, not only on
+  connect
+- Adds a **relaxed tool-admission mode to `@tetherto/mdk-agent`** (`strictToolGating: false`) so a domain agent on a stronger model
+  can admit standard MCP tools, plus charter provenance on sessions and eval manifests
 
 ## Breaking changes
 
-### The Gateway no longer hosts MCP
+### Default data root moves to `~/.mdk`
 
-[`@tetherto/mdk-gateway`](backend/core/gateway/README.md) drops its `@tetherto/mdk-mcp` dependency and every MCP code path.
-A test in [`no-mcp-coupling.test.js`](backend/core/gateway/tests/unit/lib/no-mcp-coupling.test.js) keeps it that way.
+[`@tetherto/mdk-core`](backend/core/mdk/README.md) now roots its local state in the user's home directory instead of the OS temp
+directory.
 
-| Removed | Replacement |
-| --- | --- |
-| `startGateway({ mcp: { port } })` | Run the standalone MCP server: `mdk run mcp`, or `createMcpServer()` from `@tetherto/mdk-mcp` |
-| `extraPluginDirs[].autoGenerateMcp` | Pass the same plugin dirs to `createMcpServer()` as `gatewayPluginDirs`. `extraPluginDirs` entries are now a dir or `{ dir, config }` |
-| The in-process MCP listener at `port + 100` | The standalone server, which `mdk run mcp` also defaults to the Gateway port `+ 100` |
+| Default                      | Before                        | Now                   |
+| ---------------------------- | ----------------------------- | --------------------- |
+| `getKernel()` `opts.root`    | `os.tmpdir()/mdk`             | `~/.mdk`              |
+| `startGateway()` `opts.root` | `os.tmpdir()/mdk/gateway`     | `~/.mdk/gateway`      |
+| `DEFAULT_TOPIC_FILE`         | `os.tmpdir()/mdk/.dht-topic`  | `~/.mdk/.dht-topic`   |
+| `DEFAULT_KEY_FILE`           | `os.tmpdir()/mdk/.kernel-key` | `~/.mdk/.kernel-key`  |
 
-A stack that relied on `autoGenerateMcp: true` gets no tools after upgrading until it starts the standalone server. The
-[`mvp-site`](examples/mvp-site/README.md) example shows the migration: its `--role mcp` process now serves both the
-hand-authored tools and the site Gateway plugin's routes on one endpoint (`:3101`), and the separate `:3100` endpoint is gone
-from [`.mcp.json.example`](examples/mvp-site/.mcp.json.example) and `config/site.deploy.json.example`.
-
-### `@tetherto/mdk-mcp` exports change
-
-| Export | Status |
-| --- | --- |
-| `createMcpServer(root, port, config, pluginDirs, gatewayPluginDirs)` | Gains the optional `gatewayPluginDirs` parameter (see Added) |
-| `loadGatewayPluginTools(pluginDir, context)` | New: converts one Gateway plugin's routes into MCP tools without booting a server |
-| `startMcpHttpServer` | Removed from the public surface. It has no consumer outside the package now that the Gateway boots no MCP server |
-| `generateToolsFromGatewayPlugin` | Removed from the public surface. `loadGatewayPluginTools` covers the same need from a plugin dir |
-
-`@tetherto/mdk-mcp` now depends on `@tetherto/mdk-gateway`, the reverse of the previous direction, so it can reuse the
-Gateway's own plugin loader and plugin-context builder instead of copying them.
-
-### `@tetherto/mdk-agent` exposes only what consumers use
-
-[`index.js`](backend/core/agent/index.js) re-exported 37 names from six modules. It now exports four: `createAgent`,
-`EVENT`, `isTerminal` and `AgentEventSchema`. A new `exports` map in
-[`package.json`](backend/core/agent/package.json) (`.` and `./package.json`) also closes deep imports such as
-`@tetherto/mdk-agent/src/…`. Code that imported `MemorySessionStore`, the charter, the tool-contract helpers or the eval
-helpers from the package have no supported path to them in this release.
-
-### Op Centre renamed to Op Center in the UI public surface
-
-This release replaces British spelling with the American, with no deprecated
-aliases, so each old name is removed.
-
-| Package | Removed | Replacement |
-| --- | --- | --- |
-| `@tetherto/mdk-ui-foundation` | `OP_CENTRE_LIST_THINGS_FIELDS` | `OP_CENTER_LIST_THINGS_FIELDS` |
-| `@tetherto/mdk-ui-foundation` | `OP_CENTRE_CONTAINER_WIDGETS_FIELDS` | `OP_CENTER_CONTAINER_WIDGETS_FIELDS` |
-| `@tetherto/mdk-ui-foundation` | `OP_CENTRE_CONTAINER_DETAIL_FIELDS` | `OP_CENTER_CONTAINER_DETAIL_FIELDS` |
-| `@tetherto/mdk-ui-foundation` | `OP_CENTRE_CABINET_DETAIL_FIELDS` | `OP_CENTER_CABINET_DETAIL_FIELDS` |
-| `@tetherto/mdk-react-adapter` | `OP_CENTRE_REALTIME_POLL_INTERVAL_MS` | `OP_CENTER_REALTIME_POLL_INTERVAL_MS` |
-| `hooks.json` manifest | `@category op-centre` | `@category op-center` |
-
-The category rename fails silently: a consumer filtering `hooks.json` on `category === 'op-centre'`, as the react-adapter
-README used to advise, now gets no hooks back. Change the filter to `'op-center'`.
+State under the old location is not read after upgrading. A stack that relied on the defaults starts with a fresh Kernel store, a new
+DHT topic and a new Gateway identity, so an existing `auth.whitelist` entry for the Gateway no longer matches: allowlist the new
+`status.rpcClientKey`, or pass `opts.root` to keep the previous directory. To run several examples side by side, [give each process its
+own `HOME` rather than its own `TMPDIR`](docs/guides/miners/troubleshooting.md).
 
 ## Added
 
-### `mdk run mcp`
+### Caller keypair for `@tetherto/mdk-client`
 
-The CLI gains an `mcp` run target ([`run.ts`](packages/cli/src/commands/run.ts),
-[`runtime.ts`](packages/cli/src/lib/runtime.ts)). It boots `@tetherto/mdk-mcp` pointed at every plugin in
-`spec.gateway.plugins`, so each plugin's routes become agent-callable tools with no MCP-specific authoring:
+[`createMdkClient(config)`](backend/core/client/README.md) reads a new optional `config.kernelKeyPair`, either a DHT keypair
+`{ publicKey, secretKey }` or a function returning one, and dials Kernel with it so the allowlist can name the caller. Without it the
+caller key is random per process, as before. `createRawMdkClient({ hrpc })` takes the same value as `hrpc.keyPair`. A Gateway plugin's
+`config` has it folded in (see Fixed), and [`docs/guides/gateway/plugins.md`](docs/guides/gateway/plugins.md) lists it with
+`kernelKey` and `kernelBootstrap`.
 
-- Listens on `spec.mcp.port`, a new optional field in `mdk.yaml`, else `spec.gateway.port + 100`
-- Needs the Kernel already running (`mdk run kernel`), and fails with that instruction when no Kernel key file exists
-- Checks its port first and names the `spec.mcp.port` setting to change when it is taken, as the Gateway check does
-- Forwards `spec.gateway.config` as the base config layer under each plugin's own `config`, so a plugin reads the same values
-  under `mdk run mcp` as under `mdk run gateway`
-- Is never part of `mdk run all`: start it explicitly, in its own terminal
+### Relaxed tool admission and charter provenance in `@tetherto/mdk-agent`
 
-`@tetherto/mdk-cli` gains `@tetherto/mdk-mcp` as a dependency, loaded lazily only when this target runs.
+`createAgent()` takes four new options, documented in [`README.md`](backend/core/agent/README.md) and
+[`docs/TOOLS.md`](backend/core/agent/docs/TOOLS.md).
 
-### Gateway plugins as a tool source for the MCP server
+| Option             | Default | Effect                                                             |
+| ------------------ | ------- | ------------------------------------------------------------------ |
+| `strictToolGating` | `true`  | `false` admits standard MCP tools: any identifier-shaped name, no `_meta['x-mdk-agent']` block required, widened parameter types (date-time, UUID, id-shaped names, arrays of enums or refs) and no mandatory defaults |
+| `capability`    | `'small'`, or `'mid'` when `strictToolGating` is `false` | Relaxed admission refuses `'small'` and throws at `createAgent()` |
+| `charter`          | The built-in charter | Alias for `system`. When both are given, `charter` wins. An empty or non-string value throws |
+| `charterVersion`   | `'v2'` for the built-in charter, `'custom'` for an override | Version stamp carried on the agent and every session |
 
-`createMcpServer()` takes a fifth parameter, `gatewayPluginDirs`: Gateway plugin dirs (an `mdk-plugin.json` plus routes),
-each a plain path or `{ dir, config }`. Their routes are converted into tools
-([`lib/from-gateway-plugin.js`](backend/core/mcp/lib/from-gateway-plugin.js)) and merged with the native `mcp-plugin.json`
-tools from `pluginDirs` into one tool set:
+Relaxed admission keeps the approval gate fail-safe. A tool with no `readOnlyHint` is treated as a write, and a tool named with a
+mutating verb (`create`, `delete`, `exec`, `restart` and similar) is treated as a write even when it claims to be read-only. A tool
+admitted without an `x-mdk-agent` block at the current contract version skips the result-contract check, since it never declared one.
 
-- Each Gateway plugin gets the same context shape it gets from the Gateway, built by the Gateway's own `buildPluginContext`,
-  with `onReady` callbacks fired only once the MCP listener is serving. A callback that throws is warned about and does not
-  stop the others.
-- Tool ids must be unique across both sources: a collision throws `ERR_PLUGIN_TOOL_DUPLICATE_ID` naming both plugin
-  directories, where before only duplicates within a single plugin were caught
-- Omitting the parameter behaves exactly as before
+The strict vocabulary also gains two entities, `report` and `measurement`, so `<verb>_report` and `<verb>_measurement` tools now pass
+strict admission.
 
-### A generated package reference page
-
-[`docs/reference/packages.md`](docs/reference/packages.md) lists the monorepo's packages in four groups (Core, Extensions, UI
-and Tools), with each one's purpose and availability: `workspace` for a private package used from a clone, `publishable`
-otherwise. Sample and demo packages are left out. It is generated by [`generate-package-catalog.mjs`](docs/scripts/generate-package-catalog.mjs)
-(`npm run generate:package-catalog`) and kept current by `npm run regenerate-docs`, alongside the other generated pages.
+Eval runs record the configuration they ran under: the manifest gains `charterVersion`, `charterSha256` (a hash of the exact system
+prompt) and `strictToolGating`, and `mdk-agent eval` passes the agent's values through.
 
 ## Changed
 
-- **Gateway error responses have one shape and one sanitizer**: the Fastify error handler and the plugin stream-route catch
-  both use `errorResponse()` in [`plugin-adapter.js`](backend/core/gateway/workers/lib/plugin-adapter.js). Every error body
-  is `{ statusCode, error, message }`, where plugin stream routes previously omitted `error`. `message` carries the
-  error's own text for `ERR_*` codes and for Fastify's 4xx errors (validation, content type, body size), and the status
-  text otherwise. A replaced message is logged through the request logger.
-- **Repository docs tooling moved under `docs/scripts/`**: `link-check.mjs`, `check-example-paths.mjs`,
-  `check-directory-links.mjs`, `check-md-anchors.mjs`, and `lint-md-pr.sh` left the root `scripts/` directory, which is
-  gone. The `npm run` script names are unchanged.
+- **`@tetherto/mdk-client` wraps Kernel request failures.** A call through `createMdkClient` that fails without an `ERR_*` code now
+  rejects with `ERR_MDK_CLIENT_UNAVAILABLE` (or the `opts.errorCode` override), keeping the original error as `cause`. Errors that
+  already carry an `ERR_*` code pass through unchanged. Code that matched raw transport errors from a lost Kernel connection should
+  match the code instead. The Gateway keeps serving HTTP while Kernel is unreachable, and Kernel-backed routes return that code until it
+  is back, as the [security guide](docs/guides/security/index.md) now describes.
+- **The [`auth-whitelist` example](examples/backend/kernel/auth-whitelist.js) is a two-run exchange.** The first run starts Kernel
+  open and lets the Gateway publish its persistent key. The second run allowlists that key, so the same Gateway is admitted and every
+  other caller is refused.
 
 ## Security
 
-- **Internal error messages reached Gateway clients verbatim**: the masking logic ran in an `onError` hook, where Fastify
-  does not allow a reply to be sent, so Fastify's default handler returned every thrown message unmodified. The sanitizer
-  now runs as the error handler (see Changed).
-- **Any caller could force a cache bypass**: `?overwriteCache=true` made the Gateway skip the request cache and fetch fresh
-  data from the Kernel on every cached route. It is now honored only when it is literally `true` and the request carries an
-  `Authorization` header, which also stops `?overwriteCache=false` bypassing the cache on routes without a query schema.
-  The Gateway does not validate the header itself, so a route whose controller checks no token still accepts any value, as
-  [`docs/guides/security/index.md`](docs/guides/security/index.md) now states.
+- **Identity seeds stay owner-only.** `@tetherto/mdk-core` creates its data directories with mode `0700`, and the Worker runtime
+  creates its `storeDir` with mode `0700` and writes new persistent seed files with mode `0600`
+  ([`worker-runtime.js`](backend/core/mdk-worker/lib/worker-runtime.js)). Together with the move out of the shared temp directory
+  (see Breaking changes), another local user can no longer read a seed and present the Gateway's or a Worker's identity.
+
+## Fixed
+
+- **Allowlisting `status.rpcClientKey` now admits Gateway plugins.** The Gateway already published that key, but each plugin's client
+  dialed Kernel with a random key of its own, so a non-empty `auth.whitelist` refused every plugin. The plugin context now hands each
+  client the Gateway's persistent keypair through `config.kernelKeyPair`
+  ([`plugin-gateway.js`](backend/core/gateway/workers/lib/plugin-gateway.js)). The keypair is resolved when the client connects, and a
+  host without a DHT, such as the standalone MCP server, still dials with a random key. The Gateway, Kernel and security docs now say
+  where to read the key and that it survives restarts.
 
 > For previous releases, see the [changelog archive](./docs/reference/changelog-archive/2026-archive.md)

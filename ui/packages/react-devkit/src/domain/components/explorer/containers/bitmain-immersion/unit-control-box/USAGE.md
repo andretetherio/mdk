@@ -19,9 +19,9 @@ Individual unit control box for a pump or dry-cooler within a Bitmain immersion 
 
 ## BitMainImmersionCompactUnitControlBox Props detail
 
-> **Props are generated from this component's TypeScript types, the source of truth.** The following are supplementary (object-prop shapes, allowed values, or passthrough props), not the full prop list.
+> **Props and the object shapes they reference are generated from this component's TypeScript types, the source of truth.** The following is supplementary (sub-component props, allowed values, `ref` methods, or passthrough props), not the full prop list.
 
-| Prop | Status | Type | Default | Description |
+| Prop | Status | Type / Options | Default | Description |
 | --- | --- | --- | --- | --- |
 | `title` | Optional | `string` | — | Unit label (e.g. `"Valve Control"`) |
 | `opening` | Optional | `boolean` | `false` | Show the "Opening" transition state |

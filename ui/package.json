@@ -1,7 +1,7 @@
 {
   "name": "mdk-ui",
   "type": "module",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "private": true,
   "packageManager": "npm@11.13.0",
   "engines": {
@@ -101,13 +101,15 @@
     "postcss": "^8.5.14",
     "postcss-svgo": "^6.0.2",
     "rollup@>=4.0.0 <4.59.0": ">=4.59.0",
-    "shell-quote@<1.9.0": ">=1.9.0",
+    "shell-quote": "1.12.0",
     "undici@>=7.0.0 <7.28.0": "^7.28.0",
     "svgo": "4.1.0",
     "vite@>=7.0.0 <8.0.16": ">=8.0.16",
     "ws@>=8.0.0 <=8.20.0": ">=8.20.1",
     "yaml@>=1.0.0 <1.10.3": ">=1.10.3",
-    "yaml@>=2.0.0 <2.8.3": ">=2.8.3"
+    "yaml@>=2.0.0 <2.8.3": ">=2.8.3",
+    "tinypool": "2.2.0",
+    "postcss-selector-parser": "7.1.6"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,cjs}": [

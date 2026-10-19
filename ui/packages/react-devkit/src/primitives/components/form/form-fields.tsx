@@ -147,8 +147,11 @@ export const FormTextArea = <
 // ─── FormSelect ──────────────────────────────────────────────────────────────
 
 export type FormSelectOption = {
+  /** Value written to the form field when chosen; also the React key, so keep it unique */
   value: string
+  /** Text shown in the dropdown */
   label: string
+  /** Shows the option but prevents choosing it */
   disabled?: boolean
 }
 
@@ -347,8 +350,11 @@ export const FormSwitch = <
 // ─── FormRadioGroup ──────────────────────────────────────────────────────────
 
 export type FormRadioOption = {
+  /** Value written to the form field when chosen; also the React key and part of the input `id`, so keep it unique */
   value: string
+  /** Text of the radio's `<label>` */
   label: string
+  /** Shows the radio but prevents choosing it */
   disabled?: boolean
 }
 

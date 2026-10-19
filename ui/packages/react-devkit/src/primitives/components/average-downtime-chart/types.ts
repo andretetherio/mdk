@@ -1,6 +1,9 @@
 export type AverageDowntimeChartData = {
+  /** X-axis period labels, one per bar; empty renders the empty state */
   labels: string[]
+  /** "Curtailment" downtime rate per period, as a fraction (0–1), aligned to `labels` */
   curtailment?: number[]
+  /** "Op. Issues" downtime rate per period, as a fraction (0–1), stacked on `curtailment` */
   operationalIssues?: number[]
 }
 

@@ -11,6 +11,10 @@ from a measured envelope. Composite prompts (e.g. "create a UI to show
 \<metric\> for \<device family\>") are routed as an ordered chain in
 [`mdk/SKILL.md`](./src/skills/mdk/SKILL.md).
 
+Consumers install the suite with `mdk skill add`; see the
+[agent skills guide](../../docs/guides/ui/agent-skills.md). The rest of this
+README is for working on the suite itself.
+
 ## Layout
 
 ```text
@@ -64,6 +68,9 @@ import { installSkills } from '@tetherto/mdk-skill'
 
 // Copies the assembled skills into <target>/.cursor/skills and/or
 // <target>/.claude/skills. Assembles on demand inside the monorepo.
+// Stale MDK-shipped skills (renamed or dropped since the last install) are
+// removed; each `installed` entry lists them in `removed`. Skills without the
+// `suite: mdk-developer-skill` frontmatter stamp are never touched.
 const { skills, installed } = installSkills({ client: 'all', target: process.cwd() })
 ```
 

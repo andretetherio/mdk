@@ -16,6 +16,14 @@ plain labels with an optional "Back" button on the left.
 | `onBackClick` | Optional | `VoidFunction` | - | Callback fired when the back button is clicked |
 | `separator` | Optional | `React.ReactNode` | `"/"` | Custom separator between items |
 | `showBack` | Optional | `boolean` | `false` | Show a leading "Back" button |
+
+### `BreadcrumbItem`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `label` | Required | `string` | - | Text shown for the crumb |
+| `href` | Optional | `string` | - | Renders the crumb as a link; takes precedence over `onClick` |
+| `onClick` | Optional | `VoidFunction` | - | Renders the crumb as a button when `href` is absent; with neither, the crumb is plain text |
 <!-- END GENERATED: props -->
 
 ## Example

@@ -17,11 +17,11 @@ A CSS Grid layout component that maps named areas to child `Mosaic.Item` element
 
 ## Props detail
 
-> **Props are generated from this component's TypeScript types, the source of truth.** The following are supplementary (object-prop shapes, allowed values, or passthrough props), not the full prop list.
+> **Props and the object shapes they reference are generated from this component's TypeScript types, the source of truth.** The following is supplementary (sub-component props, allowed values, `ref` methods, or passthrough props), not the full prop list.
 
 ### `Mosaic.Item`
 
-| Prop        | Status   | Type              | Default | Description                                           |
+| Prop        | Status   | Type / Options | Default | Description                                           |
 | ----------- | -------- | ----------------- | ------- | ----------------------------------------------------- |
 | `area`      | Optional | `string`          | —       | Grid area name (must match a name used in `template`) |
 | `children`  | Optional | `React.ReactNode` | —       | Item content                                          |

@@ -1,6 +1,6 @@
 import test from 'brittle'
 import { ToolSchema } from '@modelcontextprotocol/sdk/types.js'
-import { VERB, ENTITY, AXIS, CAPABILITY, AGENT_META_KEY, agentMeta, validateTool, admitTools, renderTools, TOOL_CONTRACT_VERSION } from '../../src/tools.js'
+import { VERB, ENTITY, AXIS, CAPABILITY, AGENT_META_KEY, agentMeta, validateTool, classifyParam, admitTools, renderTools, TOOL_CONTRACT_VERSION } from '../../src/tools.js'
 
 const compliant = (over = {}) => ({
   name: 'count_devices',
@@ -29,7 +29,7 @@ const compliant = (over = {}) => ({
 
 test('the taxonomy is a closed set', (t) => {
   t.alike(Object.values(VERB).sort(), ['act', 'count', 'diagnose', 'get', 'list', 'rank', 'summarize'])
-  t.alike(Object.values(ENTITY).sort(), ['device', 'pool', 'site', 'worker'])
+  t.alike(Object.values(ENTITY).sort(), ['device', 'measurement', 'pool', 'report', 'site', 'worker'])
   t.ok(Object.isFrozen(VERB) && Object.isFrozen(ENTITY) && Object.isFrozen(AXIS))
 })
 
@@ -234,4 +234,220 @@ test('agentMeta reads the contract, and is undefined when a tool carries none', 
   t.alike(agentMeta(compliant()), compliant()._meta[AGENT_META_KEY], 'reads the block back')
   t.is(agentMeta({ name: 'legacy_tool' }), undefined, 'a tool with no _meta is not an error')
   t.is(agentMeta(undefined), undefined, 'nor is a missing tool')
+})
+
+// ── relaxed tool gating (strictToolGating: false) ────────────────────────────
+// A non-conversational domain agent on a stronger model admits the standard MCP tools a Gateway
+// or external server already exposes — no verb_entity name, no _meta routing block, no closed
+// parameter vocabulary. The strict floor above is unchanged; these tests pin the relaxed path.
+
+// A plain MCP tool: named by its server, no agent metadata, free-text and typed params.
+const mcpTool = (over = {}) => ({
+  name: 'search_files',
+  description: 'Search files by query.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      query: { type: 'string' },
+      createdAfter: { type: 'string', format: 'date-time' },
+      projectId: { type: 'string' }
+    }
+  },
+  ...over
+})
+
+test('relaxed gating admits a standard MCP tool that carries no agent metadata', (t) => {
+  const { admitted, skipped } = admitTools([mcpTool()], { strictToolGating: false })
+  t.is(admitted.length, 1, 'the tool is admitted without _meta')
+  t.is(skipped.length, 0)
+
+  const meta = agentMeta(admitted[0])
+  t.is(meta.enabled, true, 'admission synthesizes a compliant routing block')
+  t.is(meta.contract, TOOL_CONTRACT_VERSION)
+  t.ok(meta.useWhen.length >= 2, 'so the tool renders and routes')
+  t.alike(meta.outOfScope, [])
+})
+
+test('strict gating still withholds that same metadata-less tool', (t) => {
+  const { admitted, skipped } = admitTools([mcpTool()])
+  t.is(admitted.length, 0, 'the small-model floor is unchanged')
+  t.is(skipped[0].reason, 'not agent-enabled')
+})
+
+test('relaxed gating accepts any identifier name but still rejects an unrenderable one', (t) => {
+  t.ok(validateTool(mcpTool({ name: 'get-weather' }), { strictToolGating: false }).ok, 'a hyphenated name is fine')
+  t.absent(validateTool(mcpTool({ name: 'get weather' }), { strictToolGating: false }).ok, 'a name with a space is not an identifier')
+  t.absent(validateTool(compliant({ name: 'get-weather' })).ok, 'strict still demands a verb_entity name')
+})
+
+test('relaxed gating tolerates an absent readOnlyHint but not a non-boolean one', (t) => {
+  t.ok(validateTool(mcpTool(), { strictToolGating: false }).ok, 'no annotations is admissible')
+  t.absent(validateTool(mcpTool({ annotations: { readOnlyHint: 'yes' } }), { strictToolGating: false }).ok,
+    'a present hint must still be a boolean')
+})
+
+test('relaxed gating renders arbitrary parameter types rather than throwing', (t) => {
+  const { admitted } = admitTools([mcpTool()], { capability: 'mid', strictToolGating: false })
+  const block = renderTools(admitted, { strictToolGating: false })
+  t.ok(block.includes('search_files'), 'the tool renders')
+  t.ok(block.includes('query=<string>'), 'free text renders as its type, never thrown away')
+  t.ok(block.includes('createdAfter=<ISO date-time>'), 'a date-time renders as one')
+  t.ok(block.includes('projectId=<id>'), 'an *Id name reads as an id')
+})
+
+test('classifyParam maps the strict vocabulary and only falls back to text when relaxed', (t) => {
+  t.is(classifyParam('family', { type: 'string', enum: ['a', 'b'] }), 'enum')
+  t.is(classifyParam('limit', { type: 'integer', minimum: 1, maximum: 9 }), 'int')
+  t.is(classifyParam('ref', { type: 'string', 'x-mdk-ref': 'device' }), 'ref')
+  t.is(classifyParam('since', { type: 'string', format: 'date-time' }), null, 'date is excluded from strict mode')
+  t.is(classifyParam('id', { type: 'string', format: 'uuid' }), null, 'uuid is excluded from strict mode')
+  t.is(classifyParam('states', { type: 'array', items: { enum: ['on', 'off'] } }), null, 'array is excluded from strict mode')
+  t.is(classifyParam('query', { type: 'string' }), null, 'free text has no strict kind')
+  t.is(classifyParam('since', { type: 'string', format: 'date-time' }, { strictToolGating: false }), 'date')
+  t.is(classifyParam('id', { type: 'string', format: 'uuid' }, { strictToolGating: false }), 'id')
+  t.is(classifyParam('states', { type: 'array', items: { enum: ['on', 'off'] } }, { strictToolGating: false }), 'array')
+  t.is(classifyParam('query', { type: 'string' }, { strictToolGating: false }), 'text', 'relaxed names it text')
+  t.is(classifyParam('userId', { type: 'string' }, { strictToolGating: false }), 'id', 'relaxed reads an *Id name as an id')
+})
+
+test('relaxed gating does not bypass an explicit enabled: false or malformed _meta', (t) => {
+  const disabled = mcpTool({ _meta: { 'x-mdk-agent': { enabled: false } } })
+  const { admitted: a1, skipped: s1 } = admitTools([disabled], { capability: 'mid', strictToolGating: false })
+  t.is(a1.length, 0)
+  t.is(s1[0].reason, 'not agent-enabled')
+
+  const malformed = mcpTool({ _meta: { 'x-mdk-agent': { enabled: true, answers: 123 } } })
+  const { admitted: a2, skipped: s2 } = admitTools([malformed], { capability: 'mid', strictToolGating: false })
+  t.is(a2.length, 0)
+  t.ok(s2[0].reason.includes('_meta["x-mdk-agent"] invalid'))
+})
+
+test('classifyParam requires string type for x-mdk-ref', (t) => {
+  t.is(classifyParam('ref', { type: 'integer', 'x-mdk-ref': 'device' }), null)
+  t.is(classifyParam('ref', { type: 'string', 'x-mdk-ref': 'device' }), 'ref')
+})
+
+test('renderParams renders ref id for array of x-mdk-refs', (t) => {
+  const tool = {
+    name: 'list_devices',
+    description: 'List devices',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        deviceIds: { type: 'array', items: { type: 'string', 'x-mdk-ref': 'device' } }
+      }
+    }
+  }
+  const { admitted } = admitTools([tool], { capability: 'mid', strictToolGating: false })
+  const block = renderTools(admitted, { strictToolGating: false })
+  t.ok(block.includes('deviceIds=[<device id>, ...]'))
+})
+
+test('relaxed gating materializes readOnlyHint: false on un-annotated or mutating-named tools', (t) => {
+  const { admitted } = admitTools([mcpTool()], { capability: 'mid', strictToolGating: false })
+  t.is(admitted[0].annotations?.readOnlyHint, false, 'un-annotated tool defaults to write fail-safe')
+  const declaredReadOnly = mcpTool({ annotations: { readOnlyHint: true } })
+  const { admitted: a2 } = admitTools([declaredReadOnly], { capability: 'mid', strictToolGating: false })
+  t.is(a2[0].annotations?.readOnlyHint, true, 'declared readOnlyHint is preserved on non-mutating name')
+
+  // CamelCase and snake_case mutating tools are forced to readOnlyHint: false even if server claims readOnlyHint: true
+  const camelDelete = mcpTool({ name: 'deleteFile', annotations: { readOnlyHint: true } })
+  const { admitted: a3 } = admitTools([camelDelete], { capability: 'mid', strictToolGating: false })
+  t.is(a3[0].annotations?.readOnlyHint, false, 'deleteFile overrides claimed readOnlyHint: true')
+
+  const camelRun = mcpTool({ name: 'runQuery', annotations: { readOnlyHint: true } })
+  const { admitted: a4 } = admitTools([camelRun], { capability: 'mid', strictToolGating: false })
+  t.is(a4[0].annotations?.readOnlyHint, false, 'runQuery overrides claimed readOnlyHint: true')
+
+  const nonMutatingAction = mcpTool({ name: 'actionPlan', annotations: { readOnlyHint: true } })
+  const { admitted: a5 } = admitTools([nonMutatingAction], { capability: 'mid', strictToolGating: false })
+  t.is(a5[0].annotations?.readOnlyHint, true, 'non-mutating word prefix is not falsely overridden')
+})
+
+test('renderParams tolerates null or missing spec in relaxed mode', (t) => {
+  const tool = {
+    name: 'search_files',
+    description: 'Search files',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: {}
+      }
+    }
+  }
+  const { admitted } = admitTools([tool], { capability: 'mid', strictToolGating: false })
+  const block = renderTools(admitted, { strictToolGating: false })
+  t.ok(block.includes('search_files'))
+  t.ok(block.includes('query=<text>'))
+})
+
+test('declared synthesized flag is stripped upon admission', (t) => {
+  const tool = mcpTool({
+    _meta: {
+      'x-mdk-agent': {
+        enabled: true,
+        answers: 'answers',
+        useWhen: ['calling tool', 'use tool'],
+        returns: 'result',
+        minCapability: 'mid',
+        synthesized: true
+      }
+    }
+  })
+  const { admitted } = admitTools([tool], { capability: 'mid', strictToolGating: false })
+  t.absent(admitted[0]._meta['x-mdk-agent'].synthesized, 'server cannot self-declare synthesized flag')
+})
+
+test('array enum validates against empty list and pipe values', (t) => {
+  const emptyEnumTool = {
+    name: 'list_devices',
+    description: 'List devices',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        tags: { type: 'array', items: { enum: [] } }
+      }
+    }
+  }
+  t.ok(validateTool(emptyEnumTool, { strictToolGating: false }).errors.some((e) => e.includes('array enum cannot be empty')))
+
+  const pipeEnumTool = {
+    name: 'list_devices',
+    description: 'List devices',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        tags: { type: 'array', items: { enum: ['a|b'] } }
+      }
+    }
+  }
+  t.ok(validateTool(pipeEnumTool, { strictToolGating: false }).errors.some((e) => e.includes('|')))
+})
+
+test('classifyParam options configure strictToolGating', (t) => {
+  t.is(classifyParam('query', { type: 'string' }, { strictToolGating: false }), 'text')
+  t.is(classifyParam('query', { type: 'string' }, { strictToolGating: true }), null)
+  t.is(classifyParam('query', { type: 'string' }), null, 'defaults to strictToolGating: true')
+})
+
+test('admitTools requires capability mid or higher when strictToolGating is false', (t) => {
+  t.exception(() => admitTools([mcpTool()], { capability: 'small', strictToolGating: false }),
+    /strictToolGating:false requires capability "mid" or higher/)
+})
+
+test('validateTool rejects non-object param schema in strict and relaxed mode', (t) => {
+  const invalidParamTool = {
+    ...compliant(),
+    inputSchema: {
+      type: 'object',
+      properties: {
+        bad: null
+      }
+    }
+  }
+  const strictResult = validateTool(invalidParamTool, { strictToolGating: true })
+  t.ok(strictResult.errors.some((e) => e.includes('param "bad" must be an object schema')), 'strict mode rejects non-object spec')
+
+  const relaxedResult = validateTool(invalidParamTool, { strictToolGating: false })
+  t.ok(relaxedResult.errors.some((e) => e.includes('param "bad" must be an object schema')), 'relaxed mode rejects non-object spec')
 })

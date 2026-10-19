@@ -41,7 +41,7 @@ Where they live inside the shape above:
 - `troubleshooting` is an array of conditional remediation strings at the health level (`capabilities.health.troubleshooting`), each entry a vendor-validated *if X then Y* runbook step.
 - `errors` is its own top-level map under `capabilities` (`capabilities.errors.<E_CODE>`), shown in the shape above; each value is the sentence the agent surfaces to the user when that code is reported.
 
-See [`backend/workers/miners/antminer/plugin/mdk-contract.json`](../../../backend/workers/miners/antminer/plugin/mdk-contract.json) for a complete worked example with all four populated.
+See [`backend/workers/miners/antminer/plugin/mdk-contract.json`](../../../backend/workers/miners/antminer/plugin/mdk-contract.json) for a complete worked example with every load-bearing field populated.
 
 ### Core
 
@@ -49,7 +49,7 @@ Nothing yet. Core monorepo presence today. The open question is whether [`backen
 
 ## What this monorepo adds on top
 
-`mdk-contract.json` covers the **runtime** contract. For the **docs / discovery** layer the monorepo adds two co-located files per artefact:
+`mdk-contract.json` covers the **runtime** contract. For the **docs / discovery** layer the monorepo adds co-located files per artefact:
 
 ```text
 backend/workers/miners/antminer/
@@ -107,13 +107,11 @@ Once `dist/index.json` is shipping, it would also unlock [`check:integrations-fr
 
 ## Gateway plugin reference
 
-The default Gateway plugins in [`backend/core/plugins/`](../../../backend/core/plugins/README.md) each ship an `mdk-plugin.json` manifest — the source of truth for their HTTP routes. [`docs/scripts/generate-plugin-reference.js`](../../scripts/generate-plugin-reference.js) (run via `npm run regenerate-docs` from the repo root, or `npm run generate:plugin-reference` in [`backend/core/plugins`](../../../backend/core/plugins/README.md) for this generator alone) reads those manifests and regenerates the route tables inside the marked region of [`backend/core/plugins/README.md`](../../../backend/core/plugins/README.md), so the published route list never drifts from the manifests. This is the same read-source-of-truth, generate, ship pattern as the Worker catalogue.
-
-Only plugins that ship in the repo are generated — plugins mounted at runtime via `startGateway({ extraPluginDirs })` live outside the repo and document their own routes. The [`check:plugin-reference-fresh`](ia.md#checkplugin-reference-fresh) gate keeps the generated tables honest, shipping as the **blocking** `docs-freshness` workflow. A stale table fails the pull request, so when a shipped plugin's routes change, run `npm run regenerate-docs` and commit the result in the same pull request.
+The Gateway plugins that ship in the repo generate their HTTP route tables from each plugin's `mdk-plugin.json`, the same read-source-of-truth, generate, ship pattern as the Worker catalogue. [`single-source-of-truth.md`](single-source-of-truth.md#supported-plugins-page) owns the generator, its sources across both plugin roots, and the output; [`check:plugin-reference-fresh`](ia.md#checkplugin-reference-fresh) is the blocking freshness gate. Plugins mounted at runtime via `startGateway({ extraPluginDirs })` live outside the repo and document their own routes.
 
 ## Decisions deferred
 
-- **JSDoc parity for core exports.** Whether [`backend/core/`](../../../backend/core/README.md) adopts UI's JSDoc shape (`@tier`, `@category`, `@domain`, `@kernelCapability`) for non-UI exports, or stays contract-free. Do not introduce a third format alongside `mdk-contract.json` and JSDoc — no `manifest.yaml` for core.
+- **JSDoc parity for core exports.** Whether [`backend/core/`](../../../backend/core/README.md) adopts UI's JSDoc shape (`@tier`, `@category`, `@domain`, `@kernelCapability`) for non-UI exports, or stays contract-free. Do not introduce another format alongside `mdk-contract.json` and JSDoc — no `manifest.yaml` for core.
 - **Where the JSON Schema lives long-term.** When monorepo absorbs schema ownership, discover location of [`mdk-contract.schema.json`](../../../backend/core/mdk-worker/mdk-contract.schema.json) — a possible home is `docs/schemas/` (not created yet; proposal only).
 - **Whether `wtype`, `cooling`, `powerModes` deserve schema fields.** The current contract has them implicitly via `commands.setPowerMode.params`, but UI catalogue browse may want first-class fields.
 - **Per-model folders** (`*/packages/hardware/<vendor>/<model>/`) appear only when there is genuinely model-specific prose the contract can't hold (firmware caveats, photos, vendor links). Default: no folder, just an entry in `modelsSupported[]`.

@@ -12,11 +12,11 @@ Time-series chart panels for Bitdeer immersion containers. `BitdeerTankPressureC
 | `chartDataPayload` | Optional | `ChartDataPayload` | - | Declarative chart configuration |
 | `chartTitle` | Optional | `string` | - | Title shown in the chart header |
 | `data` | Optional | `UnknownRecord[]` | `[]` | Raw container telemetry entries (with `ts` + nested stats group) |
-| `dateRange` | Optional | `{ start?: number \| undefined; end?: number \| undefined; }` | - | Custom date range as Unix epoch seconds. Currently unused — accepted by the shared props type but not read by the chart components |
+| `dateRange` | Optional | `{ start?: number; end?: number }` | - | Custom date range as Unix epoch seconds. Currently unused — accepted by the shared props type but not read by the chart components |
 | `fixedTimezone` | Optional | `string` | - | IANA timezone for x-axis ticks |
 | `footer` | Optional | `React.ReactNode` | - | Footer (e.g. min/max/avg stats) |
 | `height` | Optional | `number` | - | Chart pixel height |
-| `rangeOptions` | Optional | `{ label: string; value: string; }[]` | `5m/30m/3h/1D` | Override the default range selector options |
+| `rangeOptions` | Optional | `{ label: string; value: string }[]` | `5m/30m/3h/1D` | Override the default range selector options |
 | `showLegend` | Optional | `boolean` | `true` | Show the toggleable legend |
 | `showRangeSelector` | Optional | `boolean` | `true` | Show the range selector buttons |
 | `tag` | Optional | `string` | - | Container tag (any leading prefix is stripped) |
@@ -29,11 +29,11 @@ Time-series chart panels for Bitdeer immersion containers. `BitdeerTankPressureC
 | `chartDataPayload` | Optional | `ChartDataPayload` | - | Declarative chart configuration |
 | `chartTitle` | Optional | `string` | - | Title shown in the chart header |
 | `data` | Optional | `UnknownRecord[]` | `[]` | Raw container telemetry entries (with `ts` + nested stats group) |
-| `dateRange` | Optional | `{ start?: number \| undefined; end?: number \| undefined; }` | - | Custom date range as Unix epoch seconds. Currently unused — accepted by the shared props type but not read by the chart components |
+| `dateRange` | Optional | `{ start?: number; end?: number }` | - | Custom date range as Unix epoch seconds. Currently unused — accepted by the shared props type but not read by the chart components |
 | `fixedTimezone` | Optional | `string` | - | IANA timezone for x-axis ticks |
 | `footer` | Optional | `React.ReactNode` | - | Footer (e.g. min/max/avg stats) |
 | `height` | Optional | `number` | - | Chart pixel height |
-| `rangeOptions` | Optional | `{ label: string; value: string; }[]` | `5m/30m/3h/1D` | Override the default range selector options |
+| `rangeOptions` | Optional | `{ label: string; value: string }[]` | `5m/30m/3h/1D` | Override the default range selector options |
 | `showLegend` | Optional | `boolean` | `true` | Show the toggleable legend |
 | `showRangeSelector` | Optional | `boolean` | `true` | Show the range selector buttons |
 | `tag` | Optional | `string` | - | Container tag (any leading prefix is stripped) |
@@ -46,9 +46,9 @@ Time-series chart panels for Bitdeer immersion containers. `BitdeerTankPressureC
 Both components extend `ContainerChartsBuilderProps`.
 
 
-> **Props are generated from this component's TypeScript types, the source of truth.** The following are supplementary (object-prop shapes, allowed values, or passthrough props), not the full prop list.
+> **Props and the object shapes they reference are generated from this component's TypeScript types, the source of truth.** The following is supplementary (sub-component props, allowed values, `ref` methods, or passthrough props), not the full prop list.
 
-| Prop | Status | Type | Default | Description |
+| Prop | Status | Type / Options | Default | Description |
 | --- | --- | --- | --- | --- |
 | `tag` | Optional | `string` | — | Container identifier used as the API telemetry key |
 | `data` | Optional | `Array<UnknownRecord>` | — | Raw telemetry payload from the container API |

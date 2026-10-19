@@ -750,4 +750,10 @@ test('only a tool that declares the contract is judged by it', (t) => {
   const tool = contractTool('get_device')
   t.is(contractViolation(tool, 'plain prose, not JSON'), null, 'prose is not a contract breach')
   t.is(contractViolation(tool, '[1,2,3]'), null, 'nor is a bare array')
+
+  const synthesized = {
+    name: 'get_weather',
+    _meta: { 'x-mdk-agent': { synthesized: true } }
+  }
+  t.is(contractViolation(synthesized, '{"temp":72}'), null, 'a synthesized relaxed tool skips contract validation')
 })

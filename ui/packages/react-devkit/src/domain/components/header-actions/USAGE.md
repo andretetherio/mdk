@@ -32,6 +32,25 @@ Top-bar buttons designed to live in the `actions` slot of `<AppHeader>`:
 | `icon` | Optional | `React.ReactNode` | `<UserAvatarIcon />` | Override the trigger icon — defaults to the user-avatar icon |
 | `label` | Optional | `string` | `"Profile menu"` | Accessible label for the trigger button |
 | `user` | Optional | `React.ReactNode` | - | Optional user label rendered at the top of the dropdown (e.g. an email) |
+
+### `AlarmsBellButtonCounts`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `critical` | Optional | `number` | - | Critical alarm count, shown as the top badge row; omit to hide the row |
+| `high` | Optional | `number` | - | High alarm count, shown as the middle badge row; omit to hide the row |
+| `medium` | Optional | `number` | - | Medium alarm count, shown as the bottom badge row; omit to hide the row |
+
+### `ProfileMenuItem`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `label` | Required | `string` | - | Item text; also used as the React key, so keep it unique within `items` |
+| `onSelect` | Required | `() => void` | - | Called when the item is chosen by click or keyboard |
+| `danger` | Optional | `boolean` | - | Render as a destructive action (red) |
+| `description` | Optional | `React.ReactNode` | - | Optional secondary line under the label (e.g. "Current: Europe/Podgorica") |
+| `disabled` | Optional | `boolean` | - | Disable the menu item |
+| `icon` | Optional | `React.ReactNode` | - | Optional leading icon |
 <!-- END GENERATED: props -->
 
 ## `PendingActionsButton`

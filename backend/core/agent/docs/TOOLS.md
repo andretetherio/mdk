@@ -34,6 +34,28 @@ MCP server → validateTool (authored correctly?) → admitTools (may THIS model
            → renderTools (the prompt block the model reads)
 ```
 
+## Admission modes: Strict vs Relaxed
+
+Tool admission operates in one of two modes, controlled by `strictToolGating` on `createAgent()` and `admitTools()`:
+
+### Strict mode (`strictToolGating: true`, default)
+
+Designed for small on-device models (`qwen3-4b`) that route and relay but cannot compute or invent values:
+- **Naming**: strictly `<verb>_<entity>` from the closed sets (`site`, `device`, `worker`, `pool`, `report`, `measurement`).
+- **Metadata**: requires `_meta['x-mdk-agent']` with `enabled: true`, matching contract version, and capability floor.
+- **Parameters**: strictly closed enum, bounded integer, or `x-mdk-ref` string. All optional parameters must declare defaults. Free text, UUIDs, and dates classify to `null` and are rejected.
+- **Annotations**: `annotations.readOnlyHint` must be explicitly declared as a boolean (`true` or `false`). Every `act_*` tool must declare `false`.
+- **Result Contract**: returned payloads are verified against the verb's required return shape (`count`, `total`, `items`, etc.).
+
+### Relaxed mode (`strictToolGating: false`)
+
+Designed for domain agents backed by `mid` or `large` models (`capability: 'small'` is refused):
+- **Naming**: accepts any valid identifier (`^[a-zA-Z0-9_-]+$`), admitting external and domain tools (like `query_prometheus`, `fetch_metrics`, `restart_service`) that do not follow the strict `<verb>_<entity>` pattern.
+- **Metadata**: standard MCP tools lacking `_meta['x-mdk-agent']` are admitted; a synthetic routing block is generated with `contractChecked: false` (bypassing result contract validation for un-annotated tools).
+- **Parameters**: admits widened parameter types including ISO timestamps (`format: 'date-time'`), UUIDs (`format: 'uuid'`), arrays of enums/refs, and arbitrary identifier strings (`id` or `*Id`). Free text renders as `<type>` rather than throwing. Optional parameters do not require defaults.
+- **Fail-Safe Gate**: un-annotated tools default to `readOnlyHint: false` (approval gate remains on). Tools named with mutating verbs (`act`, `create`, `update`, `delete`, `exec`, `restart`, etc.) have `readOnlyHint` forced to `false` even if the server claims otherwise.
+- **Result Contract**: tools that did not pass the strict v2 contract screen (`contractChecked !== true`) bypass MDK return schema validation, so arbitrary tool payloads do not trigger false contract violations.
+
 ## Naming — the name is the routing signal
 
 Every tool is `<verb>_<entity>`, both from closed sets. The verb also fixes the result shape,
@@ -49,7 +71,7 @@ so the model learns one expectation per verb rather than one per tool.
 | `diagnose` | "why…" | `findings` |
 | `act` | "reboot / set…" | `ref`, `action`, `outcome` — **always approval-gated** |
 
-Entities: `site · device · worker · pool`. Collection verbs read in the plural
+Entities: `site · device · worker · pool · report · measurement`. Collection verbs read in the plural
 (`count_devices`), single-item verbs in the singular (`get_device`). Device families
 (miner, container…) are **parameters, not new tools** — the tool count stays bounded by
 verbs × entities, not by the question space.

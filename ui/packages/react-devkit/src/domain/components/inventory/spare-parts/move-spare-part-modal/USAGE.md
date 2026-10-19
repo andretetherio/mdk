@@ -11,11 +11,11 @@ confirmation before submitting.
 | Prop | Status | Type / Options | Default | Description |
 |------|--------|----------------|---------|-------------|
 | `locationOptions` | Required | `FormSelectOption[]` | - | Location options |
-| `onSubmit` | Required | `(values: { location: string; status: string; observation: string; }, sparePart: MoveSparePartModalSparePart) => void \| Promise<void>` | - | Submit handler with the new `{ location, status, observation }` and the original part |
+| `onSubmit` | Required | `(values: { location: string; status: string; observation: string }, sparePart: MoveSparePartModalSparePart) => void \| Promise<void>` | - | Submit handler with the new `{ location, status, observation }` and the original part |
 | `statusOptions` | Required | `FormSelectOption[]` | - | Status options |
 | `isOpen` | Optional | `boolean` | - | Whether the modal is open |
 | `onClose` | Optional | `VoidFunction` | - | Called when the modal requests to close |
-| `requestedValues` | Optional | `{ location?: string \| undefined; status?: string \| undefined; }` | - | Pre-seeds the target location/status |
+| `requestedValues` | Optional | `{ location?: string; status?: string }` | - | Pre-seeds the target location/status |
 | `sparePart` | Optional | `MoveSparePartModalSparePart` | - | The part to move; when omitted the modal renders nothing |
 <!-- END GENERATED: props -->
 

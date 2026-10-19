@@ -18,5 +18,6 @@ type StatItem = {
 }
 
 export type DashboardStats = {
+  /** One stat block each, in order: `label` (also the React key), `value`, optional `/ secondaryValue` and an `ERROR`/`SUCCESS` status dot */
   items: StatItem[]
 }

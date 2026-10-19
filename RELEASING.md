@@ -9,9 +9,9 @@ Copy this into the PR or release ticket for each release.
 ### Prepare (private repo)
 
 - [ ] Create release branch: `release/<version>`
-- [ ] Update `"version"` in every `package.json` across [`ui/`](./ui/README.md), [`backend/core/`](./backend/core/README.md), [`backend/workers/`](./backend/workers/README.md), and `examples/`
+- [ ] Update `"version"` in every tracked `package.json` (root, `backend/`, `packages/`, `ui/`, `examples/`; not the vendored `backend/lib/mdk-crypto-lib`), following the [`bump-mdk`](./skills/bump-mdk/SKILL.md) skill
 - [ ] Update any pinned `^semver` `@tetherto/*` references in [`ui/packages/`](./ui/packages/) to match the new version
-- [ ] Run installs in all three domains to refresh lockfiles: [`ui/`](./ui/README.md), [`backend/core/`](./backend/core/README.md), [`backend/workers/`](./backend/workers/README.md)
+- [ ] Refresh lockfiles: `npm install` at the repo root, in [`ui/`](./ui/README.md), and in each `examples/**` directory with its own `package-lock.json`; [`bump-mdk`](./skills/bump-mdk/SKILL.md) has the exact commands and drift check
 - [ ] Confirm no unexpected changes in [`package-lock.json`](./package-lock.json) files
 - [ ] Regenerate the generated pages: `npm run regenerate-docs`, then commit anything it changes
 - [ ] Confirm nothing is left stale: `npm run regenerate-docs -- --check` passes — run this explicitly rather than relying on
@@ -38,5 +38,5 @@ Copy this into the PR or release ticket for each release.
 
 ### Publish
 
-- [ ] Publish from the tagged commit
+- [ ] Publish from the tagged commit: the packages marked `publishable` in the [package reference](./docs/reference/packages.md)
 - [ ] Confirm published packages show the correct version

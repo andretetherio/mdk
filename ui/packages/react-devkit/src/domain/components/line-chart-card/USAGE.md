@@ -28,6 +28,14 @@ upstream domain components can keep their data wrangling local.
 | `timelineOptions` | Optional | `TimelineOption[]` | - | Timeline range selector options |
 | `title` | Optional | `string` | - | Chart title |
 | `titleExtra` | Optional | `React.ReactNode` | - | Optional node rendered next to the title (e.g. an info tooltip). Passed straight through to `ChartContainer`. Additive |
+
+### `TimelineOption`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `label` | Required | `string` | - | Range-selector button text |
+| `value` | Required | `string` | - | Timeline key (e.g. `5m`, `1h`) passed to `onTimelineChange` and matched against `timeline` |
+| `disabled` | Optional | `boolean` | - | Not forwarded to the range selector; currently has no effect |
 <!-- END GENERATED: props -->
 
 ## Minimal example

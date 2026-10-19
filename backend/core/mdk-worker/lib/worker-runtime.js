@@ -206,7 +206,7 @@ class WorkerRuntime {
   // names the Hyperbee path uses, so the RPC public key stays stable across
   // process restarts without pulling in worker-infra.
   _getOrCreateSeedFile (name) {
-    fs.mkdirSync(this.storeDir, { recursive: true })
+    fs.mkdirSync(this.storeDir, { recursive: true, mode: 0o700 })
     const seedPath = path.join(this.storeDir, name)
     try {
       const existing = fs.readFileSync(seedPath)
@@ -216,7 +216,7 @@ class WorkerRuntime {
     }
 
     const seed = crypto.randomBytes(32)
-    fs.writeFileSync(seedPath, seed)
+    fs.writeFileSync(seedPath, seed, { mode: 0o600 })
     debug('created persistent seed file: %s', name)
     return seed
   }

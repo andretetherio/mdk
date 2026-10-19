@@ -1,20 +1,20 @@
 import type { ReactNode } from 'react'
 
 export type DetailLegendItem = {
-  /** Legend label text */
+  /** Display label; also passed to `onToggle` */
   label: string
-  /** Color for the legend icon */
+  /** Hex color for the default swatch (border, plus 20% opacity fill) and the `color` of a custom `icon` */
   color: string
-  /** Custom icon to display (defaults to a colored square) */
+  /** Custom icon replacing the default color swatch */
   icon?: ReactNode
-  /** Current value display */
+  /** Value shown below the label, numbers formatted, with optional `unit`; also the row that holds `percentChange` */
   currentValue?: {
     value: number | string
     unit?: string
   }
-  /** Percentage change indicator (positive = up, negative = down) */
+  /** Percentage change shown after `currentValue`: positive as a green ▲, negative as a red ▼; hidden when `0`, `null` or without `currentValue` */
   percentChange?: number | null
-  /** Whether this legend item is hidden/dimmed */
+  /** Dims the item (30% opacity) to show its dataset is hidden */
   hidden?: boolean
 }
 

@@ -26,7 +26,7 @@ A composable dropdown menu built on Radix UI `@radix-ui/react-dropdown-menu`. Pr
 
 ### `DropdownMenuContent` Props detail
 
-| Prop         | Status   | Type                   | Default | Description                                              |
+| Prop         | Status   | Type / Options | Default | Description                                              |
 | ------------ | -------- | ---------------------- | ------- | -------------------------------------------------------- |
 | `size`       | Optional | `'sm' \| 'md' \| 'lg'` | `'md'`  | Controls item font/padding size (propagated via context) |
 | `alignWidth` | Optional | `boolean`              | `false` | Stretches the menu panel to the trigger width            |
@@ -34,7 +34,7 @@ A composable dropdown menu built on Radix UI `@radix-ui/react-dropdown-menu`. Pr
 
 ### `DropdownMenuItem` / `DropdownMenuStaticItem` Props detail
 
-| Prop       | Status   | Type              | Default | Description                                     |
+| Prop       | Status   | Type / Options | Default | Description                                     |
 | ---------- | -------- | ----------------- | ------- | ----------------------------------------------- |
 | `icon`     | Optional | `React.ReactNode` | —       | Icon prepended to the item content              |
 | `disabled` | Optional | `boolean`         | —       | Disables the item                               |
@@ -42,7 +42,7 @@ A composable dropdown menu built on Radix UI `@radix-ui/react-dropdown-menu`. Pr
 
 ### `DropdownMenuSearchable` Props detail
 
-| Prop           | Status   | Type             | Default    | Description                   |
+| Prop           | Status   | Type / Options | Default    | Description                   |
 | -------------- | -------- | ---------------- | ---------- | ----------------------------- |
 | `items`        | Required | `{ label: string; icon?: React.ReactNode; disabled?: boolean; active?: boolean }[]` | —          | Items to search and render    |
 | `placeholder`  | Optional | `string`         | `'Search'` | Input placeholder             |

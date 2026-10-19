@@ -7,7 +7,7 @@ Wraps a lazily loaded component in `React.Suspense`, displaying a fallback spinn
 
 | Prop | Status | Type / Options | Default | Description |
 |------|--------|----------------|---------|-------------|
-| `Component` | Required | `React.ComponentType<{ data?: T \| undefined; }>` | - | Lazy-loaded component to render |
+| `Component` | Required | `React.ComponentType<{ data?: T }>` | - | Lazy-loaded component to render |
 | `data` | Optional | `T` | - | Data to pass to the component |
 | `fallback` | Optional | `React.ReactNode` | `<Spinner />` | Custom fallback component while loading |
 | `spinnerType` | Optional | `"circle" \| "square"` | `"circle"` | Spinner type when using default fallback |

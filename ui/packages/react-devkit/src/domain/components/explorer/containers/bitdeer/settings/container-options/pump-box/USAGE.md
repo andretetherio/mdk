@@ -9,6 +9,13 @@ Single-pump status card showing RPM, flow, and fault state for one immersion-coo
 |------|--------|----------------|---------|-------------|
 | `pumpTitle` | Required | `string` | - | Label prefix for the pump (e.g. `"Circulation"`) |
 | `pumpItem` | Optional | `PumpItem` | - | Pump data. `index` is 0-based; displayed as `index + 1` |
+
+### `PumpItem`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `index` | Required | `number` | - | 0-based pump index, shown as `index + 1` in the title |
+| `enabled` | Optional | `boolean` | - | Running state: `true` shows a green Running indicator, `false` a gray Off one; when not a boolean the box renders nothing |
 <!-- END GENERATED: props -->
 
 ## Minimal example

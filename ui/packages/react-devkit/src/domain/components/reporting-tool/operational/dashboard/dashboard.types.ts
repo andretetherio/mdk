@@ -83,7 +83,9 @@ export type UseOperationsDashboardResult = {
 
 /** Shared props for the three line-trend chart components. */
 export type OperationalTrendChartProps = Partial<{
+  /** Line-chart payload from `useOperationsDashboard`; the card shows an empty state when it has no data */
   data: LineChartCardData
+  /** Shows the card's loading state and suppresses the empty state */
   isLoading: boolean
   isExpanded: boolean
   onToggleExpand: VoidFunction
@@ -91,7 +93,9 @@ export type OperationalTrendChartProps = Partial<{
 
 /** Props for the miners-status chart component. */
 export type OperationalMinersStatusChartProps = Partial<{
+  /** Stacked bar-chart labels and datasets; "No miners data available" shows when `datasets` is empty */
   data: MinersStatusChartData
+  /** Shows the card's loading state and suppresses the empty state */
   isLoading: boolean
   isExpanded: boolean
   onToggleExpand: VoidFunction

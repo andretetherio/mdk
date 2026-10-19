@@ -26,7 +26,7 @@ The [run a mining site tutorial][run-a-site] walks `full-site` end to end.
 
 ## Plugin-authoring end-to-end ([`mdk-plugin-e2e/`](./mdk-plugin-e2e/))
 
-### [`run.js`](./mdk-plugin-e2e/run.js) — WorkerRuntime + worker plugin + gateway plugin
+### [`run.js`](./mdk-plugin-e2e/run.js) — `WorkerRuntime` + Worker plugin + Gateway plugin
 
 Single-process, automated example showing how to author a Worker as a plugin ([`mdk-plugin-e2e/worker-plugin/`](./mdk-plugin-e2e/worker-plugin/index.js)) hosted on `WorkerRuntime`, backed by mock devices ([`mdk-plugin-e2e/mock-device/`](./mdk-plugin-e2e/mock-device/)), with a Kernel gateway plugin ([`mdk-plugin-e2e/gateway-plugin/`](./mdk-plugin-e2e/gateway-plugin/)) that serves a fleet-summary endpoint over DHT/HRPC. Exercises telemetry and command flows end-to-end, then exits cleanly.
 
@@ -34,7 +34,7 @@ Single-process, automated example showing how to author a Worker as a plugin ([`
 node examples/backend/mdk-plugin-e2e/run.js
 ```
 
-## Demo worker ([`demo-worker-caller/`](./demo-worker-caller/index.js))
+## Demo Worker ([`demo-worker-caller/`](./demo-worker-caller/index.js))
 
 ### [`index.js`](./demo-worker-caller/index.js) — hosting a bare Worker plugin on `WorkerRuntime`
 
@@ -46,7 +46,7 @@ node examples/backend/demo-worker-caller/index.js     # Ctrl+C to stop
 
 ## Antminer site ([`miners/antminer/`](./miners/antminer/README.md))
 
-### [`index.js`](./miners/antminer/index.js) — Kernel + gateway + 4 Antminer Workers
+### [`index.js`](./miners/antminer/index.js) — Kernel + Gateway + 4 Antminer Workers
 
 A config-driven, single-process **Antminer** site: one Kernel, one HTTP gateway, and four Antminer
 Workers (S19XP, S19XP Hydro, S21, S21 Pro), each backed by a mock device and registered as a thing.
@@ -179,16 +179,23 @@ node examples/backend/kernel/telemetry-flow.js     # Ctrl+C to stop
 
 ### [`auth-whitelist.js`](./kernel/auth-whitelist.js) — HRPC auth allowlist
 
-Shows how to restrict Kernel access to specific clients via the HRPC firewall allowlist. Only clients
+Shows how to restrict Kernel access to one Gateway via the HRPC firewall allowlist. Only clients
 whose DHT public key is in the allowlist can connect; everyone else is refused at the network layer.
+The Gateway's key is persistent and published as `status.rpcClientKey`, so the exchange is two runs:
+the first starts the Kernel open and lets the Gateway publish its key, the second allowlists it.
+
+> [!NOTE]
+> The [Kernel transport docs](../../backend/core/kernel/README.md#transports) explain the allowlist, and
+> [Step 2 of the security blueprint](../../docs/guides/security/index.md#step-2-admit-the-gateway-to-kernel) covers it in production.
 
 ```bash
-node examples/backend/kernel/auth-whitelist.js     # Ctrl+C to stop
+node examples/backend/kernel/auth-whitelist.js     # run twice; Ctrl+C to stop
+curl localhost:3210/site-monitor/hashrate
 ```
 
 ## Notes
 
-**Store isolation** — each example writes to its own directory under the system temp folder (`/tmp/mdk-example-*`). Running two instances of the same example simultaneously causes a hypercore file-lock error.
+**Store isolation** — each example writes to its own directory under the system temp folder (`/tmp/mdk-example-*`). Running two instances of the same example simultaneously causes a Hypercore file-lock error.
 
 **Cleanup** — all long-running examples install a `SIGINT` handler (Ctrl+C) that stops the adapter, manager, and Kernel gracefully before exiting.
 

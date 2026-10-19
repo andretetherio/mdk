@@ -1,8 +1,10 @@
 'use strict'
 
 const test = require('brittle')
+const crypto = require('crypto')
+const DHT = require('hyperdht')
 const { HRPCListener } = require('../../../kernel/lib/transport/hrpc-listener')
-const { createRawMdkClient } = require('../../index')
+const { createRawMdkClient, createMdkClient } = require('../../index')
 
 function createMockModules () {
   const workers = [
@@ -155,4 +157,18 @@ test('hrpc client - no transport throws ERR_MDK_CLIENT_TRANSPORT_REQUIRED', (t) 
 
 test('hrpc client - removed ipc option no longer selects a transport', (t) => {
   t.exception(() => createRawMdkClient({ ipc: '/tmp/kernel.sock' }), /ERR_MDK_CLIENT_TRANSPORT_REQUIRED/)
+})
+
+test('hrpc client - kernelKeyPair pins the caller key the Kernel allowlist sees', async (t) => {
+  const keyPair = DHT.keyPair(crypto.randomBytes(32))
+  const callerKey = keyPair.publicKey.toString('hex')
+  const listener = new HRPCListener({ ...createMockModules(), whitelist: [callerKey] })
+  const { publicKey } = await listener.start()
+  t.teardown(() => listener.stop())
+
+  const mdkClient = createMdkClient({ kernelKey: publicKey.toString('hex'), kernelKeyPair: () => keyPair })
+  t.teardown(() => mdkClient.close())
+
+  const res = await mdkClient.listWorkers()
+  t.is(res.workers.length, 1, 'admitted by an allowlist that names only that keypair')
 })

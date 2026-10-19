@@ -10,8 +10,11 @@ import { MinerStatusColors } from '../../explorer/details-view/miners-activity-c
 import type { TimelineChartData } from '../../timeline-chart'
 
 export type PowerModeTimelineEntry = {
+  /** Sample time (epoch ms); consecutive samples with the same mode merge into one bar */
   ts?: number
+  /** Power mode keyed by miner; takes precedence over the miner's status for the bar's mode */
   power_mode_group_aggr?: Record<string, string>
+  /** Status keyed by miner; its keys decide which miners get a row, and an entry without it adds nothing */
   status_group_aggr?: Record<string, string>
   [key: string]: unknown
 }

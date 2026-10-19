@@ -17,13 +17,13 @@ Tabbed content panels built on Radix UI. Compose with `TabsList`,
 
 ## `TabsList` / `TabsTrigger` Props detail
 
-> **Props are generated from this component's TypeScript types, the source of truth.** The following are supplementary (object-prop shapes, allowed values, or passthrough props), not the full prop list.
+> **Props and the object shapes they reference are generated from this component's TypeScript types, the source of truth.** The following is supplementary (sub-component props, allowed values, `ref` methods, or passthrough props), not the full prop list.
 
 Both accept a `variant` prop that has no effect on `Tabs` itself. `TabsList` and
 `TabsTrigger` are internal sub-components not emitted to the registry, so this
 table is the source of truth for their `variant` until they are surfaced there.
 
-| Prop      | Status   | Type | Default     | Description |
+| Prop      | Status   | Type / Options | Default     | Description |
 | --------- | -------- | ---- | ----------- | ----------- |
 | `variant` | Optional | `"default" \| "side" \| "underline"` | `"default"` | `default` (baseline), `side` (left rail), or `underline` (per-tab underline indicator, white active label) |
 

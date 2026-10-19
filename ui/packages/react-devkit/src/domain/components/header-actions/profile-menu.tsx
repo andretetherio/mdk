@@ -2,7 +2,9 @@ import { cn, DropdownMenu, UserAvatarIcon } from '@primitives'
 import type { JSX, ReactNode } from 'react'
 
 export type ProfileMenuItem = {
+  /** Item text; also used as the React key, so keep it unique within `items` */
   label: string
+  /** Called when the item is chosen by click or keyboard */
   onSelect: () => void
   /** Render as a destructive action (red). */
   danger?: boolean

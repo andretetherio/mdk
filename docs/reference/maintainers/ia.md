@@ -7,7 +7,7 @@ The monorepo builds on contracts that already ship:
 - **Workers** ship [`mdk-contract.json`](../../../backend/workers/miners/antminer/plugin/mdk-contract.json) per package,
 validated against [`mdk-contract.schema.json`](../../../backend/core/mdk-worker/mdk-contract.schema.json), vendored in this repo.
 The contract carries metadata, telemetry, commands, health, and errors — programmatic contract + AI reasoning context in one file.
-- **UI** components carry JSDoc tags (`@tier`, `@category`, `@domain`, `@orkCapability`); the registry generator (`ui/packages/react-devkit/scripts/generate-registry.mts`)
+- **UI** components carry JSDoc tags (`@tier`, `@category`, `@domain`, `@kernelCapability`); the registry generator (`ui/packages/react-devkit/scripts/generate-registry.mts`)
 and sibling generators emit `dist/registry.json`,
 `dist/blueprints.json`, `dist/hooks.json`, `dist/stores.json`. See [`ui/AGENTS.md`](../../../ui/AGENTS.md).
 <!-- mdk-monorepo: repoint to package-level AGENTS.md until ui/docs/AGENT_READY.md is populated -->
@@ -23,9 +23,6 @@ backend/workers/<family>/<provider>/
   examples/run-<scenario>.js     # new — one runnable Node file per scenario (qvac model)
 ```
 
-> Examples ship as runnable `.js` files (e.g. `run-s19xp.js`), matching what is on disk. Earlier drafts named these `<scenario>.start.sh`; `.js`
-> is the convention in use.
-
 UI component:
 
 ```text
@@ -35,7 +32,7 @@ ui/<pkg>/src/.../<component>/
   <component>.example.tsx        # new — runnable, co-located
 ```
 
-`USAGE.md` and the runnable examples are the only new conventions. They complement the existing contracts; they never duplicate fields the contract or JSDoc already owns.
+`USAGE.md` and the runnable examples are the only new conventions. See [`agent-ready-sdk.md`](agent-ready-sdk.md#what-this-monorepo-adds-on-top) for what goes in them and the rule against restating contract or JSDoc fields.
 
 ## Where docs live
 
@@ -44,13 +41,13 @@ ui/<pkg>/src/.../<component>/
 | [`docs/`](../../README.md) | Role-based router ([`README.md`](../../README.md)) and end-user-facing SoT content ([`concepts/`](../../concepts/)) |
 | [`docs/reference/maintainers/`](README.md) | Docs maintainer plumbing: this file, [`agent-ready-sdk.md`](agent-ready-sdk.md), [`tag-vocab.yaml`](tag-vocab.yaml), [`single-source-of-truth.md`](single-source-of-truth.md), and the hand-maintained [`integrations/`](integrations/index.md) catalogue (lives here, not at `docs/integrations/`, until [`check:integrations-fresh`](#checkintegrations-fresh) keeps it honest) |
 | [`backend/core/docs/`](../../../backend/core/docs/README.md) | Core workspace conventions (`mdk`, `client`, `kernel`, `gateway`, …) |
-| [`ui/`](../../../ui/README.md) | UI workspace conventions for react-devkit, adapter, ui-foundation, cli |
+| [`ui/`](../../../ui/README.md) | UI workspace conventions for react-devkit, adapter, ui-foundation, CLI |
 | [`backend/workers/docs/`](../../../backend/workers/docs/architecture.md) | Workers workspace conventions (Worker lifecycle, install pattern, taxonomy) |
 | `*/packages/**/<artefact>/` | Per-artefact contract + docs: `mdk-contract.json` (Workers, existing) or JSDoc on `src/` (UI), plus `USAGE.md` and `examples/` |
 
 ## Integration ontology
 
-Three "kinds" used by the docs catalogue for browsing. Each kind is a **docs-side roll-up** over one or more `metadata.deviceFamily` values:
+The "kinds" used by the docs catalogue for browsing. Each kind is a **docs-side roll-up** over one or more `metadata.deviceFamily` values:
 
 | Kind | `device-families` it covers | Examples |
 |------|-----------------------------|----------|
@@ -85,10 +82,7 @@ default is just an entry in `metadata.modelsSupported[]`.
 
 ## QA gates
 
-Suggested CI checks that would make the IA self-enforcing. **None are wired today and none are prerequisites for the BE or FE port.** Engineering
-decides whether to adopt each gate per-team; for any gate not adopted, docs maintainers absorb the upkeep manually (each section below names the
-fallback). The constraint surface stays where it belongs — [`mdk-contract.schema.json`](../../../backend/core/mdk-worker/mdk-contract.schema.json) for Workers, the UI registry generator for components —
-whether or not these gates ever land.
+Suggested CI checks that would make the IA self-enforcing. **Most are not wired today** (`check:agent-ready` and `check:plugin-reference-fresh` are the exceptions) **and none are prerequisites for the BE or FE port.** Engineering decides whether to adopt each remaining gate per-team; for any gate not adopted, docs maintainers absorb the upkeep manually (each section below names the fallback). The constraint surface stays in [`mdk-contract.schema.json`](../../../backend/core/mdk-worker/mdk-contract.schema.json) for Workers and the UI registry generator for components, whether or not these gates land.
 
 ### `check:contract`
 
@@ -107,7 +101,7 @@ warn-only validation in [`generate-catalogue.js`](../../../backend/workers/scrip
 
 Drift detector for the presentation overlay in [`tag-vocab.yaml`](tag-vocab.yaml). After the aggregator runs
 (see [Derived vocabulary](#derived-vocabulary)) it compares overlay entries against the slugs actually shipping in contracts and JSDoc
-and reports two kinds of drift:
+and reports these kinds of drift:
 
 1. **Missing labels** — a slug appears in a `mdk-contract.json` or in JSDoc but has no entry in the overlay. The catalogue falls back to the
 raw slug, so this is a soft warning, not a build break.
@@ -127,7 +121,7 @@ catalogue keeps working in the meantime — no production blocker.
 ### `check:agent-ready` (UI side)
 
 The UI workspace's lint gate fails when a public export is missing required JSDoc tags (`@tier`, `@category`,
-`@domain`, `@orkCapability`) or its co-located `USAGE.md` / `*.example.tsx`. It runs as a blocking root-CI gate — the **🤖 Agent-readiness contract (UI)** job in [`.github/workflows/ci.yml`](../../../.github/workflows/ci.yml) — paired with a **🔒 USAGE baseline monotonicity** job that compares `usage-proptable-baseline.json` against the pull request base as sets, so the baseline can only shrink.
+`@domain`, `@kernelCapability`) or its co-located `USAGE.md` / `*.example.tsx`. It is the one gate already wired, as a blocking root-CI job; [`single-source-of-truth.md`](single-source-of-truth.md#pr-workflow) owns the job detail and its paired USAGE-baseline check.
 
 **Why it matters:** the contract this IA describes only holds if every UI export actually carries the JSDoc that drives `dist/registry.json`. The
 gate is what keeps that promise honest.
@@ -145,7 +139,6 @@ downstream port-sync transforms. Soft warning, not a hard gate — adding a new 
 internal-only). Without this gate, a new slug added without a comment is silently invisible to the pipeline until the build breaks downstream.
 
 **Ownership:** this gate is docs-side and has no engineering dependency — docs maintainers can wire it whenever there's appetite for the work.
-Until then, port signals are eyeballed during docs review.
 
 ### `check:integrations-fresh`
 
@@ -164,7 +157,7 @@ Until then, port signals are eyeballed during docs review.
 Drift detector for the hand-maintained catalogue tables under [`integrations/`](integrations/index.md). Would walk
 `backend/workers/**/mdk-contract.json` and compare against the rows in [`integrations/hardware/*.md`](integrations/hardware/index.md) and
 [`integrations/pools.md`](integrations/pools.md) (external services have no rows yet — no Worker has shipped in that kind).
-If adopted, it would report two kinds of drift:
+If adopted, it would report these kinds of drift:
 
 1. **Workers missing from the catalogue** — a shipping Worker has no row in the relevant index table. The catalogue is meant to be exhaustive,
 so this would be a build failure.
@@ -188,9 +181,7 @@ stay under [`maintainers/`](./README.md) and never graduate to user-facing `docs
 > [`supported-plugins.md`](../supported-plugins.md). The
 > `docs-freshness` workflow runs the regen-and-diff check on pull requests.
 
-Freshness gate for the generated supported-plugins page. The `docs-freshness` workflow runs `npm run regenerate-docs -- --check`, which
-regenerates, compares against the last commit, restores the tree, and reports a non-empty diff in [`supported-plugins.md`](../supported-plugins.md).
-It catches one kind of drift:
+Freshness gate for the generated supported-plugins page. The `docs-freshness` workflow runs the [`regenerate-docs -- --check`](single-source-of-truth.md#checking-without-changing-anything) report mode and reports a non-empty diff in [`supported-plugins.md`](../supported-plugins.md). It catches one kind of drift:
 
 1. **Tables stale after a manifest change** — a route added, removed, or re-described in a plugin's `mdk-plugin.json` is not reflected
 in the generated tables.
@@ -211,7 +202,7 @@ There is no `mdk-plugin.schema.json` today. The manifest format is enforced impe
 [`backend/core/gateway/workers/lib/plugin-loader.js`](../../../backend/core/gateway/workers/lib/plugin-loader.js) and documented
 by example (the shipping manifests) and by the loader rather than as a generated field table.
 
-A machine-readable schema would enable two things:
+A machine-readable schema would enable:
 
 1. **Generated field-table docs** — the manifest format section in [`backend/core/plugins/README.md`](../../../backend/core/plugins/README.md)
    could be generated from the schema the same way route tables are generated from manifests
@@ -232,19 +223,9 @@ hardcoding a command list again — the mechanism (diff a CI-run `--help` output
 
 ### Combined effect
 
-With all eight wired, an LLM browsing the catalogue can rely on eight guarantees:
+Wired, each gate closes one drift path, named in its section above: contracts parse against the schema (`check:contract`), UI exports carry their JSDoc and prose (`check:agent-ready`), the overlay tracks what ships (`check:facets-fresh`), cross-references carry port hints (`check:port-signals`), the integration catalogue tracks shipping Workers (`check:integrations-fresh`), the supported-plugins page tracks each manifest (`check:plugin-reference-fresh`), every `mdk-plugin.json` is well-formed (`check:plugin-manifest`), and tutorial command lists track the source (`check:tutorial-commands-fresh`).
 
-1. Every Worker contract parses cleanly against the engineer-owned schema (`check:contract`).
-2. Every UI export carries the JSDoc and co-located prose the catalogue expects (`check:agent-ready`).
-3. The presentation overlay does not silently drift from what actually ships (`check:facets-fresh`).
-4. Every cross-reference in user-facing Markdown carries a port-time routing hint (`check:port-signals`).
-5. The hand-maintained integration catalogue tables stay in step with shipping Workers (`check:integrations-fresh`).
-6. The generated supported-plugins page stays in step with each plugin's `mdk-plugin.json` (`check:plugin-reference-fresh`, shipping as a blocking check).
-7. Every `mdk-plugin.json` in the repo is well-formed against the machine-readable schema (`check:plugin-manifest`).
-8. Hardwired command lists in tutorial prose stay in step with the source code they document (`check:tutorial-commands-fresh`).
-
-Without these gates, docs maintainers chase drift manually — the IA still describes the shape, only the enforcement is missing. With them,
-the constraint surface stays where it belongs (schema + JSDoc validator) and the docs layer stays an overlay, never a gatekeeper.
+Unwired, maintainers chase that drift by hand: the IA still describes the shape, only enforcement is missing. The constraint surface stays in the schema and JSDoc validator; the docs layer stays an overlay, never a gatekeeper.
 
 ## Derived vocabulary
 
@@ -258,7 +239,7 @@ JSDoc; those are the facts. A YAML in [`docs/`](../../README.md) declaring what'
 the contract validates, but the docs CI yells until somebody updates a parallel file in another folder. That is exactly the parallel process
 this IA is designed to avoid.
 
-### Three buckets, three sources of truth
+### Buckets and their sources of truth
 
 | Vocabulary axis | Real source of truth | What docs should do |
 |-----------------|----------------------|---------------------|

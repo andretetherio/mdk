@@ -47,6 +47,25 @@ A set of components for displaying paginated incident and activity log lists ins
 | `pagination` | Optional | `LogPagination` | - | Pagination config; hides pagination when on page 1 or data is empty |
 | `skeletonRows` | Optional | `number` | `4` | Number of skeleton rows shown during loading |
 | `type` | Optional | `string` | - | Log type (`'Incidents'` or `'Activity'`); controls the `LogDot` appearance |
+
+### `LogData`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `body` | Required | `string` | - | Body text; `\|`-separated values are split into separate lines |
+| `status` | Required | `string` | - | Severity / status string (`'Critical'`, `'High'`, `'Medium'`, activity status, etc.) |
+| `subtitle` | Required | `string` | - | Secondary text (truncated with `title` tooltip) |
+| `title` | Required | `string` | - | Primary text |
+| `uuid` | Required | `string` | - | Unique identifier |
+
+### `LogPagination`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `current` | Required | `number` | - | Current page number |
+| `handlePaginationChange` | Required | `(page: number) => void` | - | Fired when the user changes the page |
+| `pageSize` | Required | `number` | - | Items per page |
+| `total` | Required | `number` | - | Total number of items |
 <!-- END GENERATED: props -->
 
 ## Exports
@@ -57,28 +76,6 @@ A set of components for displaying paginated incident and activity log lists ins
 | `LogRow` | A single log entry row (status dot + item content) |
 | `LogItem` | The content area of a log entry (title, subtitle, body, and optional navigate arrow) |
 | `LogDot` | Status indicator dot rendered to the left of a `LogItem` — appearance varies by `type` |
-
-### `LogData`
-
-
-> **Props are generated from this component's TypeScript types, the source of truth.** The following are supplementary (object-prop shapes, allowed values, or passthrough props), not the full prop list.
-
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `uuid` | `string` | Unique identifier |
-| `title` | `string` | Primary text |
-| `subtitle` | `string` | Secondary text (truncated with `title` tooltip) |
-| `body` | `string` | Body text; `\|`-separated values are split into separate lines |
-| `status` | `string` | Severity / status string (`'Critical'`, `'High'`, `'Medium'`, activity status, etc.) |
-
-### `LogPagination`
-
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `current` | `number` | Current page number |
-| `total` | `number` | Total number of items |
-| `pageSize` | `number` | Items per page |
-| `handlePaginationChange` | `(page: number) => void` | Fired when the user changes the page |
 
 ## Example
 

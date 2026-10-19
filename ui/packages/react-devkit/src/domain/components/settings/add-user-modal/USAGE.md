@@ -8,7 +8,7 @@ Modal form for inviting a new user to the system. Captures name, email address, 
 | Prop | Status | Type / Options | Default | Description |
 |------|--------|----------------|---------|-------------|
 | `onClose` | Required | `VoidFunction` | - | Called when the user dismisses the modal (cancel or backdrop) |
-| `onSubmit` | Required | `(data: { name: string; email: string; role: string; }) => Promise<void>` | - | Async handler called with validated form values on submission |
+| `onSubmit` | Required | `(data: { name: string; email: string; role: string }) => Promise<void>` | - | Async handler called with validated form values on submission |
 | `open` | Required | `boolean` | - | Controls whether the dialog is visible |
 | `roles` | Required | `RoleOption[]` | - | List of assignable roles rendered in the role select drop-down |
 | `isSubmitting` | Optional | `boolean` | `false` | Disables the submit button and shows a loading label while the parent is saving |

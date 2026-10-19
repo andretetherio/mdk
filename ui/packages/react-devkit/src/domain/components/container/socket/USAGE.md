@@ -21,6 +21,20 @@ Per-socket panel representing a single PDU slot in a container. Shows the miner 
 | `power_w` | Optional | `number \| null` | `null` | Power in watts |
 | `selected` | Optional | `boolean` | `false` | Whether socket is selected |
 | `socket` | Optional | `number \| null` | `null` | Socket number/index |
+
+### `Heatmap`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `isHeatmapMode` | Optional | `boolean` | - | Show the heatmap value and color in place of the socket index |
+| `mode` | Optional | `string` | - | Metric to plot: `pcb`, `chip` or `inlet` (read from `miner.temperature`) or `hashrate` (a `HEATMAP_MODE` value) |
+| `ranges` | Optional | `Record<string, { min?: number; max?: number }>` | - | Color-scale bounds keyed by mode; `ranges[mode]` sets the min/max the value is colored against (missing bounds count as 0) |
+
+### `Pdu`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `pdu` | Optional | `string \| number` | - | PDU identifier, written to the socket's `data-pdu-index` attribute; not displayed |
 <!-- END GENERATED: props -->
 
 ## Minimal example

@@ -10,7 +10,7 @@ Body region of an alarm card. Renders a scrollable list of `AlarmRow` entries fr
 
 #### Props detail
 
-| Prop         | Status   | Type                            | Default | Description                  |
+| Prop         | Status   | Type / Options | Default | Description                  |
 | ------------ | -------- | ------------------------------- | ------- | ---------------------------- |
 | `alarmsData` | Required | `TimelineItemData[] \| unknown` | —       | Alert entries to render. Falls back to `EmptyState` when empty or falsy. |
 | `onNavigate` | Required | `(path: string) => void`        | —       | Navigation callback forwarded to each `AlarmRow` |
@@ -21,7 +21,7 @@ Single alarm-feed row with a severity dot, timestamp, source device label, and t
 
 #### Props detail
 
-| Prop         | Status   | Type                     | Default | Description                                                      |
+| Prop         | Status   | Type / Options | Default | Description                                                      |
 | ------------ | -------- | ------------------------ | ------- | ---------------------------------------------------------------- |
 | `data`       | Required | `TimelineItemData`       | —       | The alarm entry to render                                        |
 | `onNavigate` | Required | `(path: string) => void` | —       | Called when the row is clicked (routes to the alarm detail page) |

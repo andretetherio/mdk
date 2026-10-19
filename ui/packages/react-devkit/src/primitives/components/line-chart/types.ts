@@ -13,7 +13,10 @@ export type LineDataset = {
   data: LineDataPoint[]
 }
 export type LineSeriesApi = ISeriesApi<'Line', Time>
-export type LineChartData = { datasets: LineDataset[] }
+export type LineChartData = {
+  /** One line series per entry; `visible: false` hides a series without removing it */
+  datasets: LineDataset[]
+}
 
 export type LightWeightLineChartProps = {
   /**

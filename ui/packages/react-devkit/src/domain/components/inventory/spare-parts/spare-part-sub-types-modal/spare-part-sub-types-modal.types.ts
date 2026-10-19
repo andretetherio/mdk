@@ -1,6 +1,8 @@
 /** A selectable part type shown as a tab in the subtypes modal. */
 export type SparePartSubTypesModalPartType = {
+  /** Tab value; matched against `activePartTypeId` and passed to `onPartTypeChange` */
   value: string
+  /** Tab text */
   label: string
 }
 

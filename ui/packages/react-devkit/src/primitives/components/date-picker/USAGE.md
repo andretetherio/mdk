@@ -33,6 +33,20 @@ picker includes presets and a modal-style popover with Clear / Apply actions.
 | `selected` | Optional | `DateRange` | - | Selected date range |
 | `showPresets` | Optional | `boolean` | `true` | Whether to show preset buttons |
 | `triggerClassName` | Optional | `string` | - | Custom className for the trigger button |
+
+### `DateRange`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `from` | Required | `Date` | - | Range start; `undefined` means nothing is selected and the placeholder shows |
+| `to` | Optional | `Date` | - | Range end; while unset the trigger shows `from` alone and Apply stays disabled |
+
+### `PresetItem`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `label` | Required | `string` | - | Preset button text; also used as the React key, so keep it unique |
+| `value` | Required | `DateRange` | - | Range applied to the draft on click; needs both `from` and `to`. Highlighted when the draft is within 5 minutes of it at both ends |
 <!-- END GENERATED: props -->
 
 ## Example

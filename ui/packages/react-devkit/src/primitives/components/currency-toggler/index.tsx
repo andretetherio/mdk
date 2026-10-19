@@ -2,8 +2,11 @@ import { forwardRef } from 'react'
 import { cn } from '../../utils'
 
 type CurrencyItem = {
+  /** Option value (used for selection) */
   value: string
+  /** Display label (defaults to `value`) */
   label?: string
+  /** Disables this option */
   disabled?: boolean
 }
 

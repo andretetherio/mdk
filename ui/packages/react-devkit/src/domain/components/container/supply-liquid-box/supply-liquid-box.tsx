@@ -16,6 +16,7 @@ import { firstNumeric } from './supply-liquid-box.utils'
 import './supply-liquid-box.scss'
 
 export type SupplyLiquidBoxContainerSettings = {
+  /** Container threshold config from the API; `waterTemperature` (`criticalLow`, `alarmLow`, `normal`, `alarmHigh`, `criticalHigh`) and `supplyLiquidPressure` (`criticalLow`, `alarmLow`, `alarmHigh`, `criticalHigh`) set the reading colors and flashing; a group missing any key falls back to built-in defaults */
   thresholds?: Record<string, UnknownRecord>
 }
 

@@ -1,7 +1,9 @@
 import type { TimeframeTypeValue } from '../../../constants/ranges'
 
 export type TimeframeControlsDateRange = {
+  /** Range start (epoch ms); the year/month/week pickers sync to this date */
   start: number
+  /** Range end (epoch ms); matched with `start` against calendar weeks to restore a week selection */
   end: number
 }
 

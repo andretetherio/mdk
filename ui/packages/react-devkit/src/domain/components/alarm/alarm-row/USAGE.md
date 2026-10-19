@@ -9,6 +9,14 @@ Single alarm-feed row with a severity dot, timestamp, source device label, and t
 |------|--------|----------------|---------|-------------|
 | `data` | Required | `TimelineItemData` | - | The alarm entry to render |
 | `onNavigate` | Required | `(path: string) => void` | - | Called when the row is clicked; receives the alarm `uuid` as the path segment |
+
+### `TimelineItemData`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `children` | Required | `React.ReactNode` | - | Prebuilt `LogItem` node, set by `getAlertTimelineItems`; not rendered by `AlarmRow` |
+| `dot` | Required | `React.ReactNode` | - | Timeline marker (e.g. `LogDot`), set by `getAlertTimelineItems`; not rendered by `AlarmRow` |
+| `item` | Required | `AlarmItemData` | - | The alarm rendered by the row: `title`, `subtitle`, `body` (split on `\|` into lines), `status` (`Critical`, `High` or `Medium` sets the color and icon) and `uuid` (click target `/alerts/<uuid>`) |
 <!-- END GENERATED: props -->
 
 ## Minimal example

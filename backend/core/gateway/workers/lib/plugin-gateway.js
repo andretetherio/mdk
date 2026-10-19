@@ -17,7 +17,9 @@ const { pluginLogger } = require('./logger')
 //
 // Everything else a plugin needs it owns: kernel and worker data — live or
 // historical — go through the plugin's own mdk client, built from
-// config.kernelKey/kernelBootstrap (see the telemetry plugin's lib/client.js).
+// config.kernelKey/kernelKeyPair/kernelBootstrap (see the telemetry plugin's
+// lib/client.js). kernelKeyPair is the persistent keypair status.rpcClientKey
+// is read from, so plugin clients dial the Kernel with the allowlisted key.
 
 // What a plugin's log lines are tagged with. The manifest name is the plugin's
 // own identity; the scope is dropped because the tag prefixes every line.
@@ -37,6 +39,9 @@ function buildPluginContext (wrk, pluginDir, pluginConf) {
     // gateway-wide conf, so a plugin's settings live with the plugin.
     config: Object.freeze({
       kernelKey: kernelKey || null,
+      // resolved lazily: net_r0.dht does not exist yet when plugins load; a
+      // host without one (the MCP server's shim) dials with an ephemeral key
+      kernelKeyPair: () => wrk.net_r0?.dht?.defaultKeyPair,
       kernelBootstrap: wrk.ctx.kernelBootstrap || null,
       ...wrk.conf,
       ...pluginConf

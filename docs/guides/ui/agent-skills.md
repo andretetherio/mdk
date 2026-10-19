@@ -41,7 +41,9 @@ steps.
 </details>
 
 Skills land flat: one directory per skill, each with its own `SKILL.md`. Agents discover them automatically, so there is
-no rule file to wire by hand.
+no rule file to wire by hand. Installs are copies, not links: rerun `mdk skill add` after upgrading MDK to refresh
+them. The rerun also removes MDK-shipped skills the new version no longer includes, so a renamed or dropped skill
+cannot linger and keep triggering. Skills you authored yourself in the same directory are left alone.
 
 ## What the suite covers
 
@@ -66,7 +68,21 @@ visuals come from the Devkit. The [page recipe][page-recipe] spells out each lay
 
 Open the project in a skills-aware agent and state one of the intents above. The agent should name the skill it
 activated. If nothing activates, confirm the skill files landed in your project (for example under `.cursor/skills/` or
-`.claude/skills/`). Those directories are gitignored by default, so the suite is installed per developer, not committed.
+`.claude/skills/`). `mdk skill add` does not edit `.gitignore`. Add the installed skill directories to yours so the
+suite stays per developer, not committed. Ignore the suite's directories by name rather than the whole skills folder,
+which may also hold your team's own committed skills:
+
+```gitignore
+.claude/skills/mdk/
+.claude/skills/mdk-worker-plugin/
+.claude/skills/mdk-gateway-plugin/
+.claude/skills/mdk-ui-component/
+.claude/skills/mdk-deployment/
+.claude/skills/mdk-site-sizing/
+```
+
+Repeat for `.cursor/skills/` if you install there. `.claude/skills/mdk*/` is a shorter alternative, but it also hides
+any skill of your own whose name starts with `mdk`.
 
 ## Next steps
 

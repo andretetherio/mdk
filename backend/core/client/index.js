@@ -217,7 +217,7 @@ function createWorkerClient (rpcKey, hrpcOpts = {}) {
  * createMdkClient
  *
  * The client most consumers want: instantiate once from an ambient plugin
- * config ({ kernelKey, kernelBootstrap }) and call action methods directly —
+ * config ({ kernelKey, kernelKeyPair, kernelBootstrap }) and call action methods directly —
  * `mdkClient.listWorkers()` — like any connection-pooling DB client. The
  * first call connects (memoized); a failed connect resets the memo so the
  * next request retries. A host booted without a reachable Kernel keeps its
@@ -227,9 +227,9 @@ function createWorkerClient (rpcKey, hrpcOpts = {}) {
  * connect() is optional (explicit warm-up); close() tears the connection
  * down and lets a later call reconnect.
  *
- * @param {object} config - Ambient plugin config; reads kernelKey/kernelBootstrap
+ * @param {object} config - Ambient plugin config; reads kernelKey/kernelKeyPair/kernelBootstrap
  * @param {object} [opts]
- * @param {string} [opts.errorCode]  - ERR_ code for missing key / failed connect
+ * @param {string} [opts.errorCode]  - ERR_ code for missing key / failed connect / failed Kernel request
  * @param {object} [opts.transport]  - Pre-built transport; test seam
  * @returns {object} Auto-connecting client with the raw client's surface
  */
@@ -241,6 +241,7 @@ function createMdkClient (config = {}, opts = {}) {
       ? createRawMdkClient({
         hrpc: {
           key: config.kernelKey,
+          ...(config.kernelKeyPair ? { keyPair: config.kernelKeyPair } : {}),
           ...(config.kernelBootstrap ? { bootstrap: config.kernelBootstrap } : {})
         }
       })
@@ -282,7 +283,14 @@ function createMdkClient (config = {}, opts = {}) {
       return async (...args) => {
         const client = await ensure()
         if (typeof client[prop] !== 'function') throw new Error(`ERR_MDK_CLIENT_NO_SUCH_METHOD: ${prop}`)
-        return client[prop](...args)
+        try {
+          return await client[prop](...args)
+        } catch (err) {
+          if (/^ERR_/.test(err.code || err.message)) throw err
+          const wrapped = new Error(`${errCode}: ${err.message}`, { cause: err })
+          wrapped.code = errCode
+          throw wrapped
+        }
       }
     }
   })

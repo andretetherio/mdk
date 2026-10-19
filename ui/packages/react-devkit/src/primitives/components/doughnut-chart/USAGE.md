@@ -17,19 +17,15 @@ A Chart.js doughnut chart with a custom HTML legend, slice toggle, and percentag
 | `options` | Optional | `object` | - | Chart.js options – merged with defaults |
 | `tooltip` | Optional | `ChartTooltipConfig` | - | Custom HTML tooltip configuration. When provided, replaces the default doughnut tooltip (which shows label, value with unit, and percentage). Use `valueFormatter` to replicate the percentage display if needed |
 | `unit` | Optional | `string` | `""` | Unit suffix appended to values in tooltips and legends |
-<!-- END GENERATED: props -->
-
-## Props detail
-
-> **Props are generated from this component's TypeScript types, the source of truth.** The following are supplementary (object-prop shapes, allowed values, or passthrough props), not the full prop list.
 
 ### `DoughnutChartDataset`
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `label` | `string` | yes | Slice label |
-| `value` | `number` | yes | Numeric slice value |
-| `color` | `string` | no | Slice color (falls back to the built-in palette) |
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `label` | Required | `string` | - | Slice label |
+| `value` | Required | `number` | - | Numeric slice value |
+| `color` | Optional | `string` | - | Slice color (falls back to the built-in palette) |
+<!-- END GENERATED: props -->
 
 ## Example
 

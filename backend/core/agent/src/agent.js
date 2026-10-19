@@ -3,6 +3,7 @@ import { connectMcp } from './mcp.js'
 import { Session } from './session.js'
 import { MemorySessionStore } from './session-store.js'
 import { admitTools, CAPABILITY } from './tools.js'
+import { charterVersionFor } from './charter.js'
 
 /**
  * QVAC model endpoint. `external` talks to an already-running server; `managed` spawns one.
@@ -48,6 +49,8 @@ import { admitTools, CAPABILITY } from './tools.js'
  * @property {object|null} mcp
  * @property {object[]} tools
  * @property {object[]} skipped
+ * @property {string} charterVersion            version stamp of the charter this agent runs
+ * @property {boolean} strictToolGating         whether small-model tool gating is in force
  * @property {import('./session-store.js').MemorySessionStore} store
  * @property {(opts?: { timeoutMs?: number, onWait?: function }) => Promise<number>} waitReady
  * @property {(opts?: CreateSessionOptions) => Promise<import('./session.js').Session>} createSession
@@ -61,7 +64,10 @@ import { admitTools, CAPABILITY } from './tools.js'
  * @property {McpConfig} [mcp]                     `{ url }` of a Streamable HTTP MCP server
  * @property {AgentLimits} [limits]
  * @property {string} [system]                     override the operator-assistant charter
- * @property {'small'|'mid'|'large'} [capability]  tool-admission floor; default `'small'`
+ * @property {string} [charter]                    alias for `system`; the agent's standing instruction
+ * @property {string} [charterVersion]            version stamp for the charter; default `'v2'`, or `'custom'` for a custom charter with no version given
+ * @property {boolean} [strictToolGating]          small-model tool gating; default `true`. `false` admits standard MCP tools for a stronger domain agent
+ * @property {'small'|'mid'|'large'} [capability]  tool-admission floor; default `'small'`, or `'mid'` when strictToolGating is false
  * @property {string[]} [notCovered]               topics the prompt says tools do not cover; `[]` drops the block
  * @property {import('./session-store.js').MemorySessionStore} [store]  default in-memory; supply Redis/SQL for a gateway
  */
@@ -83,8 +89,18 @@ export async function createAgent (config = {}) {
 
   const provider = await resolveProvider(config.provider)
   const limits = config.limits ?? {}
-  const system = config.system
-  const capability = config.capability ?? CAPABILITY.SMALL
+  // `charter` is the named alias; `system` is kept as the back-compatible spelling. A caller that
+  // supplies both gets `charter`, since it is the more specific name.
+  const system = config.charter ?? config.system
+  if (system !== undefined && (typeof system !== 'string' || !system.trim())) {
+    throw new Error('createAgent: charter must be a non-empty string')
+  }
+  const strictToolGating = config.strictToolGating ?? true
+  const capability = config.capability ?? (strictToolGating ? CAPABILITY.SMALL : CAPABILITY.MID)
+  if (!strictToolGating && capability === CAPABILITY.SMALL) {
+    throw new Error(`createAgent: strictToolGating:false requires capability "mid" or higher, got "${capability}"`)
+  }
+  const charterVersion = config.charterVersion ?? charterVersionFor(system)
   const notCovered = config.notCovered
   const store = config.store ?? new MemorySessionStore()
 
@@ -93,7 +109,7 @@ export async function createAgent (config = {}) {
   let skipped = []
   if (config.mcp?.url) {
     mcp = await connectMcp(config.mcp.url)
-    ;({ admitted: tools, skipped } = admitTools(await mcp.listTools(), { capability }))
+    ;({ admitted: tools, skipped } = admitTools(await mcp.listTools(), { capability, strictToolGating }))
   }
 
   /**
@@ -111,6 +127,8 @@ export async function createAgent (config = {}) {
     mcp,
     notCovered,
     ...opts,
+    charterVersion,
+    strictToolGating,
     store,
     id: record.id,
     userId: record.userId,
@@ -123,6 +141,8 @@ export async function createAgent (config = {}) {
     tools,
     skipped,
     system,
+    charterVersion,
+    strictToolGating,
 
     waitReady (opts) {
       return provider.waitReady(opts)

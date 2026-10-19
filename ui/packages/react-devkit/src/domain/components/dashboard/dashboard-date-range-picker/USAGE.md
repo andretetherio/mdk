@@ -15,6 +15,13 @@ intermediate `Date <-> number` plumbing in the page.
 | `className` | Optional | `string` | - | Optional class hook |
 | `dateFormat` | Optional | `string` | `"dd/MM/yyyy"` | Display format. Defaults to `dd/MM/yyyy` |
 | `disabled` | Optional | `boolean` | `false` | Disable the trigger |
+
+### `DashboardDateRange`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `end` | Required | `number` | - | Window end, milliseconds since epoch |
+| `start` | Required | `number` | - | Window start, milliseconds since epoch |
 <!-- END GENERATED: props -->
 
 ## Example

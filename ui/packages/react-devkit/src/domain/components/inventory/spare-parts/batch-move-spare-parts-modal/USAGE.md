@@ -12,9 +12,18 @@ observation, applied to every selected part in one submit.
 | `isOpen` | Required | `boolean` | - | Whether the modal is open |
 | `locationOptions` | Required | `FormSelectOption[]` | - | New-location options |
 | `onClose` | Required | `VoidFunction` | - | Called when the modal requests to close |
-| `onSubmit` | Required | `(values: { location: string \| null; status: string \| null; observation: string \| null; }) => void \| Promise<void>` | - | Submit handler; unselected fields are `null` |
+| `onSubmit` | Required | `(values: { location: string \| null; status: string \| null; observation: string \| null }) => void \| Promise<void>` | - | Submit handler; unselected fields are `null` |
 | `spareParts` | Required | `BatchMoveSparePart[]` | - | The parts to move, rendered in the table |
 | `statusOptions` | Required | `FormSelectOption[]` | - | New-status options |
+
+### `BatchMoveSparePart`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `code` | Required | `string` | - | Part code, shown in the Code column |
+| `id` | Required | `string` | - | Part identifier; not rendered, kept so the caller can map the move back to its records |
+| `location` | Required | `string` | - | Current location value; shown as the matching `locationOptions` label, or the raw value when none matches |
+| `status` | Required | `string` | - | Current status value; shown as the matching `statusOptions` label, or the raw value when none matches |
 <!-- END GENERATED: props -->
 
 ## When to use

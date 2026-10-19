@@ -9,6 +9,13 @@ Headline card that summarises miner statistics (hash rate, efficiency, temperatu
 |------|--------|----------------|---------|-------------|
 | `params` | Required | `MinersSummaryParam[]` | - | Array of label-value pairs to display in a 2-column grid |
 | `className` | Optional | `string` | - | Additional CSS class name |
+
+### `MinersSummaryParam`
+
+| Field | Status | Type / Options | Default | Description |
+|------|--------|----------------|---------|-------------|
+| `label` | Required | `string` | - | Parameter label |
+| `value` | Required | `string` | - | Pre-formatted display value (including units) |
 <!-- END GENERATED: props -->
 
 ## Minimal example

@@ -14,7 +14,7 @@ the parent resolves.
 | `isOpen` | Required | `boolean` | - | Controls modal visibility |
 | `miners` | Required | `Device[]` | - | Miners to display in the selection table |
 | `onClose` | Required | `() => void` | - | Called when the modal is dismissed (× button or backdrop) |
-| `onSubmit` | Required | `(values: { pool: PoolSummary; }) => Promise<void>` | - | Called with the selected pool when the form is submitted |
+| `onSubmit` | Required | `(values: { pool: PoolSummary }) => Promise<void>` | - | Called with the selected pool when the form is submitted |
 | `poolConfig` | Required | `PoolConfigEntry[]` | - | Available pool configurations to populate the pool selector |
 <!-- END GENERATED: props -->
 
