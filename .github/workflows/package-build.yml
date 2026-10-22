@@ -1,0 +1,104 @@
+# Plans, builds, packs and checks the MDK npm packages for the checked-out ref.
+#
+# Called by publish.yml (tarballs uploaded for its publish job) and by ci.yml on
+# release PRs, as a rehearsal where nothing is uploaded or published. There is
+# no id-token here, so install and build scripts never run with publish rights.
+#
+#   plan   .github/scripts/npm-publish.mjs picks the packages that are ready for
+#          npm and whose package.json version isn't on npm yet (so a release
+#          that bumps one package builds just that one), checks internal pins,
+#          and orders them into dependency waves
+#   build  one matrix job per install root (repo root, ui/): fresh install,
+#          build, npm pack, check each tarball holds its entry points
+name: Package build
+
+on:
+  workflow_call:
+    inputs:
+      selection:
+        description: 'Packages to build as JSON: {"all": true}, or the publish.yml checkboxes (toJSON(inputs))'
+        required: false
+        default: '{"all": true}'
+        type: string
+      dist-tag:
+        description: "npm dist-tag the plan is for"
+        required: false
+        default: latest
+        type: string
+      upload:
+        description: "Upload the tarballs as artifacts"
+        required: false
+        default: false
+        type: boolean
+    outputs:
+      plan:
+        description: "Publish plan (JSON)"
+        value: ${{ jobs.plan.outputs.plan }}
+      publish-count:
+        description: "Number of packages to publish"
+        value: ${{ jobs.plan.outputs.publish-count }}
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "lts/*"
+
+jobs:
+  plan:
+    name: Plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      plan: ${{ steps.plan.outputs.plan }}
+      matrix: ${{ steps.plan.outputs.matrix }}
+      publish-count: ${{ steps.plan.outputs.publish-count }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Plan
+        id: plan
+        env:
+          REF: ${{ github.ref_name }}
+          REF_TYPE: ${{ github.ref_type }}
+          SELECTION: ${{ inputs.selection }}
+          DIST_TAG: ${{ inputs.dist-tag }}
+        run: >-
+          node .github/scripts/npm-publish.mjs plan
+          --ref "$REF" --ref-type "$REF_TYPE" --selection "$SELECTION" --dist-tag "$DIST_TAG"
+
+  build:
+    name: Build (${{ matrix.group }})
+    needs: plan
+    if: needs.plan.outputs.publish-count != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
+      # node-setup-cache always runs a fresh `npm ci`, so release tarballs never
+      # build on top of a restored node_modules.
+      - uses: ./.github/actions/node-setup-cache
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          working-directory: ${{ matrix.root }}
+      - uses: ./.github/actions/build-packages
+        with:
+          working-directory: ${{ matrix.root }}
+          packages: ${{ matrix.packages }}
+          pack-destination: tarballs
+      - if: inputs.upload
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: tarballs-${{ matrix.group }}
+          path: tarballs/*.tgz
+          if-no-files-found: error
+          retention-days: 7

@@ -1,0 +1,171 @@
+# Publishes the MDK packages to npm with trusted publishing (OIDC, no npm token).
+#
+# Run it from the Actions tab with "Use workflow from" set to the release tag:
+# a repo-wide tag (v0.13.0) for a coordinated release, or a per-package tag
+# (mdk-cli@0.12.1) when one package moves on its own. The workflow, the build
+# action and the packages all come from that tag. Start with dry-run on, check
+# the plan in the run summary, then run it again with dry-run off.
+#
+# Versions are per package: each package publishes the version in its own
+# package.json, and only if that version isn't on npm yet. Leave "all" checked
+# to publish everything that's new, or uncheck it and tick the packages to
+# publish together. Adding a publishable package? Add its checkbox below
+# (named after the package without @tetherto/); until then the plan warns and
+# the package can only go out with "all". GitHub allows 25 inputs per form.
+#
+#   build    package-build.yml: plan, then build + pack + check per install
+#            root, tarballs uploaded as artifacts
+#   publish  waits for `mdk-publish` approval on the `release` environment, then
+#            publishes the tarballs wave by wave and stops at the first failure.
+#            Re-running is safe: versions already on npm are skipped
+#
+# npm side: each package has a trusted publisher bound to tetherto/mdk, this
+# file (publish.yml) and the `release` environment, set up in
+# tetherto/github-ops (mdk/repos.json). npm publish has to stay in this file for
+# the OIDC token to match that publisher.
+name: Publish to npm
+
+on:
+  workflow_dispatch:
+    inputs:
+      all:
+        description: "All packages (only versions not on npm yet). Uncheck to pick packages below"
+        type: boolean
+        default: true
+      mdk-kernel:
+        description: "mdk-kernel (backend/core/kernel)"
+        type: boolean
+        default: false
+      mdk-skill:
+        description: "mdk-skill (packages/mdk-skill)"
+        type: boolean
+        default: false
+      mdk-client:
+        description: "mdk-client (backend/core/client)"
+        type: boolean
+        default: false
+      mdk-worker:
+        description: "mdk-worker (backend/core/mdk-worker)"
+        type: boolean
+        default: false
+      mdk-app-runtime:
+        description: "mdk-app-runtime (backend/core/app-runtime)"
+        type: boolean
+        default: false
+      mdk-gateway:
+        description: "mdk-gateway (backend/core/gateway)"
+        type: boolean
+        default: false
+      mdk-core:
+        description: "mdk-core (backend/core/mdk)"
+        type: boolean
+        default: false
+      mdk-mcp:
+        description: "mdk-mcp (backend/core/mcp)"
+        type: boolean
+        default: false
+      mdk-cli:
+        description: "mdk-cli (packages/cli)"
+        type: boolean
+        default: false
+      mdk-ui-foundation:
+        description: "mdk-ui-foundation (ui/packages/ui-foundation)"
+        type: boolean
+        default: false
+      mdk-fonts:
+        description: "mdk-fonts (ui/packages/fonts)"
+        type: boolean
+        default: false
+      mdk-react-adapter:
+        description: "mdk-react-adapter (ui/packages/react-adapter)"
+        type: boolean
+        default: false
+      mdk-react-devkit:
+        description: "mdk-react-devkit (ui/packages/react-devkit)"
+        type: boolean
+        default: false
+      mdk-ui-agent:
+        description: "mdk-ui-agent (ui/packages/ui-agent)"
+        type: boolean
+        default: false
+      dist-tag:
+        description: "npm dist-tag"
+        required: true
+        default: latest
+        type: choice
+        options:
+          - latest
+          - next
+      dry-run:
+        description: "Plan and build only, don't publish"
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: "lts/*"
+
+jobs:
+  check-ref:
+    name: Check ref
+    if: ${{ !inputs.dry-run && github.ref_type != 'tag' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: |
+          echo "::error::Publishing needs a release tag (v0.13.0 or mdk-cli@0.12.1), not ${GITHUB_REF_NAME}"
+          exit 1
+
+  build:
+    name: Build
+    needs: check-ref
+    if: ${{ !cancelled() && needs.check-ref.result != 'failure' }}
+    uses: ./.github/workflows/package-build.yml
+    with:
+      selection: ${{ toJSON(inputs) }}
+      dist-tag: ${{ inputs.dist-tag }}
+      upload: true
+
+  publish:
+    name: Publish
+    needs: build
+    if: >-
+      !cancelled() && needs.build.result == 'success' &&
+      !inputs.dry-run && github.ref_type == 'tag' &&
+      github.repository == 'tetherto/mdk' &&
+      needs.build.outputs.publish-count != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: release
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          sparse-checkout: .github/scripts
+          persist-credentials: false
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: "https://registry.npmjs.org"
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: tarballs-*
+          path: tarballs
+          merge-multiple: true
+      # npm authenticates through OIDC when no token is configured, and attaches
+      # provenance automatically for public repos.
+      - name: Publish
+        env:
+          PLAN: ${{ needs.build.outputs.plan }}
+        run: |
+          printf '%s' "$PLAN" > "$RUNNER_TEMP/plan.json"
+          node .github/scripts/npm-publish.mjs publish --plan "$RUNNER_TEMP/plan.json" --dir tarballs

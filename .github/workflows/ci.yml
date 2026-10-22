@@ -566,9 +566,6 @@ jobs:
     timeout-minutes: 30
     needs: [detect-target, setup-ui]
     if: needs.detect-target.outputs.run_ui == 'true'
-    defaults:
-      run:
-        working-directory: ${{ env.UI_DIR }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
@@ -578,7 +575,9 @@ jobs:
           cache-key: ${{ needs.setup-ui.outputs.cache-key }}
           node-version: ${{ env.NODE_VERSION }}
           working-directory: ${{ env.UI_DIR }}
-      - run: npm run build --if-present
+      - uses: ./.github/actions/build-packages
+        with:
+          working-directory: ${{ env.UI_DIR }}
 
   setup-core:
     name: 📦 Setup Core (${{ matrix.dir }})
@@ -850,9 +849,6 @@ jobs:
       fail-fast: false
       matrix:
         dir: ${{ fromJson(needs.list-core.outputs.buildable_dirs) }}
-    defaults:
-      run:
-        working-directory: ${{ matrix.dir }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
@@ -862,7 +858,9 @@ jobs:
           cache-key: ${{ needs.setup-core.outputs.cache-key }}
           node-version: ${{ env.NODE_VERSION }}
           working-directory: ${{ matrix.dir }}
-      - run: npm run build
+      - uses: ./.github/actions/build-packages
+        with:
+          working-directory: ${{ matrix.dir }}
 
   setup-workers:
     name: 📦 Setup Worker (${{ matrix.dir }})
@@ -1014,9 +1012,6 @@ jobs:
       fail-fast: false
       matrix:
         dir: ${{ fromJson(needs.list-workers.outputs.buildable_dirs) }}
-    defaults:
-      run:
-        working-directory: ${{ matrix.dir }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
@@ -1026,7 +1021,16 @@ jobs:
           cache-key: ${{ needs.setup-workers.outputs.cache-key }}
           node-version: ${{ env.NODE_VERSION }}
           working-directory: ${{ matrix.dir }}
-      - run: npm run build
+      - uses: ./.github/actions/build-packages
+        with:
+          working-directory: ${{ matrix.dir }}
+
+  # Rehearses the npm publish on release PRs (release/* -> main): builds, packs
+  # and checks every package that's ready for npm, without publishing anything.
+  pack-check:
+    name: 📦 Pack Check (release)
+    if: github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')
+    uses: ./.github/workflows/package-build.yml
 
   security_checks:
     name: 🔐 Security Checks
@@ -1303,6 +1307,7 @@ jobs:
       - setup-examples
       - test-examples
       - coverage-summary
+      - pack-check
     steps:
       - name: Write job summary
         shell: bash
@@ -1321,6 +1326,7 @@ jobs:
           WRK_SETUP: ${{ needs.setup-workers.result || 'skipped' }}
           EX_SETUP: ${{ needs.setup-examples.result || 'skipped' }}
           EX_TEST: ${{ needs.test-examples.result || 'skipped' }}
+          PACK: ${{ needs.pack-check.result || 'skipped' }}
         run: |
           ic() {
             case "$1" in
@@ -1343,6 +1349,7 @@ jobs:
             echo "| 🧱 Core | $(ic "${CORE_SETUP}") \`${CORE_SETUP}\` | $(ic "${SEC_CORE}") \`${SEC_CORE}\` |"
             echo "| ⚙️ Workers | $(ic "${WRK_SETUP}") \`${WRK_SETUP}\` | $(ic "${SEC_WRK}") \`${SEC_WRK}\` |"
             echo "| 📋 Examples | $(ic "${EX_SETUP}") \`${EX_SETUP}\` (test: $(ic "${EX_TEST}") \`${EX_TEST}\`) | — |"
+            echo "| 📦 Release pack check | $(ic "${PACK}") \`${PACK}\` | — |"
             echo ""
             echo "### What ran"
             echo "- **Lockfile consistency** in setup jobs (root lock for workspace members, own lock for standalone packages)"
