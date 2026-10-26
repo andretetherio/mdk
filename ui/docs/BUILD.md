@@ -1,8 +1,8 @@
 # Build system, scripts and watch mode
 
-The MDK UI monorepo compiles TypeScript and SCSS across four packages (`mdk-ui-foundation`, `mdk-react-adapter`, 
-`mdk-react-devkit`, `mdk-fonts`) and a catalog app. Turborepo orchestrates the dependency order and caches 
-outputs; Vite handles SCSS compilation for the devkit and fonts. 
+The MDK UI monorepo compiles TypeScript and SCSS across three packages (`mdk-ui-foundation`, `mdk-react-adapter`,
+`mdk-react-devkit`) and a catalog app. Turborepo orchestrates the dependency order and caches
+outputs; Vite handles SCSS compilation for the devkit.
 
 This guide covers the full pipeline — configuration files, every script, and watch mode.
 
@@ -24,8 +24,7 @@ npm run dev        # watch everything and start the catalog app
     packages are **pre-built** — `tsc` emits ESM JS + `.d.ts`
     declarations under `dist/` and every `exports` map resolves there,
     so external npm consumers never compile our source
-  - Vite for SCSS compilation in `@tetherto/mdk-react-devkit` and
-    `@tetherto/mdk-fonts`
+  - Vite for SCSS compilation in `@tetherto/mdk-react-devkit`
   - A small custom PostCSS plugin
     ([`packages/react-devkit/postcss-mdk-layer.mjs`](../packages/react-devkit/postcss-mdk-layer.mjs)) that wraps top-level
     rules in `@layer mdk` and prepends `@layer base, mdk, app;`
@@ -52,7 +51,6 @@ Turborepo
    ├── @tetherto/mdk-ui-foundation           (build:ts: tsc → dist/ ESM + d.ts)
    ├── @tetherto/mdk-react-adapter     (build:ts: tsc → dist/ ESM + d.ts)
    ├── @tetherto/mdk-react-devkit      (build:ts: tsc → dist/ ESM + d.ts, then build:scss: vite → dist/styles.css + dist/styles-domain.css)
-   ├── @tetherto/mdk-fonts             (build:scss: vite → dist/jetbrains-mono.css)
    └── apps/catalog                    (build: vite → dist/, consumes all packages from their dist/)
 ```
 
@@ -60,9 +58,8 @@ When you run a full build, Turborepo will:
 
 1. Build `@tetherto/mdk-ui-foundation` first (no workspace deps).
 2. Build `@tetherto/mdk-react-adapter` after the core (depends on it).
-3. Build `@tetherto/mdk-fonts` in parallel (no workspace deps).
-4. Build `@tetherto/mdk-react-devkit` after its workspace deps complete.
-5. Build [`apps/catalog`](../apps/catalog/README.md) last.
+3. Build `@tetherto/mdk-react-devkit` after its workspace deps complete.
+4. Build [`apps/catalog`](../apps/catalog/README.md) last.
 
 Every TypeScript package ships a pre-built `dist/`. The devkit's SCSS is compiled into two layer-wrapped stylesheets: 
 `dist/styles.css` (design tokens + core primitives) and `dist/styles-domain.css` (mining-domain components). 
@@ -261,15 +258,6 @@ npm run --workspace @tetherto/mdk-react-devkit dev:scss    # vite build --watch
 npm run --workspace @tetherto/mdk-react-devkit test
 ```
 
-### `@tetherto/mdk-fonts`
-
-Font assets only.
-
-```bash
-npm run --workspace @tetherto/mdk-fonts build
-npm run --workspace @tetherto/mdk-fonts dev
-```
-
 ### [`apps/catalog`](../apps/catalog/README.md) (`@tetherto/mdk-catalog-ui`)
 
 ```bash
@@ -317,9 +305,8 @@ npm run clean              # delete dist/ across all packages
 ```
 @tetherto/mdk-ui-foundation              (built JS + d.ts)
   └── @tetherto/mdk-react-adapter  (built JS + d.ts)
-        └── @tetherto/mdk-react-devkit ─┐  (built JS + d.ts + CSS)
-                                        ├──→ @tetherto/mdk-catalog-ui
-@tetherto/mdk-fonts ────────────────────┘  (CSS only, no JS deps)
+        └── @tetherto/mdk-react-devkit     (built JS + d.ts + CSS)
+              └── @tetherto/mdk-catalog-ui
 ```
 
 Turborepo guarantees the correct order and parallelizes independent
@@ -327,7 +314,6 @@ tasks:
 
 - `mdk-ui-foundation` builds before `mdk-react-adapter`.
 - `mdk-react-adapter` builds before `mdk-react-devkit`.
-- `mdk-fonts` builds in parallel with the React stack.
 - The catalog build sees up-to-date `dist/` for every workspace
   dependency.
 

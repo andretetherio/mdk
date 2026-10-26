@@ -23,7 +23,7 @@ const formSchema = z.object({
   email: validators.email(),
   role: validators.enum(['operator', 'technician', 'admin']),
   bio: validators.optionalString({ maxLength: 200 }),
-  notifications: z.boolean().default(false),
+  notifications: z.boolean(),
   priority: validators.enum(['low', 'medium', 'high'], 'Please select a priority level'),
   startDate: validators.date({ required: true }),
   terms: validators.requiredBoolean('You must accept the terms'),

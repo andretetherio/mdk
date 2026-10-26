@@ -38,7 +38,6 @@ export const createLibConfig = ({ packageDir }) => {
                     'mdk-react-devkit': 'react-devkit',
                     'mdk-ui-foundation': 'ui-foundation',
                     'mdk-react-adapter': 'react-adapter',
-                    'mdk-fonts': 'fonts',
                   }
                   const pkgFolder = pkgMap[pkgName] ?? pkgName
                   const pkgPath = resolve(

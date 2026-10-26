@@ -54,7 +54,6 @@ added later without touching the core. Dependency flow:
   subpath, also re-exported from the package root) — reach for it instead
   of reimplementing SSE/transport/conversation-store logic elsewhere in
   the workspace.
-- **[`packages/fonts`](./packages/fonts/README.md)** (`@tetherto/mdk-fonts`) — JetBrains Mono assets.
 - **[`apps/catalog`](./apps/catalog/README.md)** — Vite/React showcase wrapped in `<MdkProvider>`.
 
 The TS packages ship pre-built `dist/` so consumers don't compile our

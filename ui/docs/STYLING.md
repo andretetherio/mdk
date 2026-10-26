@@ -200,7 +200,6 @@ authored as SCSS and shipped as two layer-wrapped CSS files.
 | ------------------------------ | --------------------------------------- | ----------------------------------- |
 | `@tetherto/mdk-react-devkit`   | [`src/styles.scss`](../packages/react-devkit/src/styles.scss)                       | `dist/styles.css` (core)            |
 | `@tetherto/mdk-react-devkit`   | [`src/styles-domain.scss`](../packages/react-devkit/src/styles-domain.scss)                | `dist/styles-domain.css`            |
-| `@tetherto/mdk-fonts`          | [`src/jetbrains-mono.scss`](../packages/fonts/src/jetbrains-mono.scss)               | `dist/jetbrains-mono.css`           |
 
 The other two TypeScript packages (`mdk-ui-foundation` and
 `mdk-react-adapter`) have no styles.
@@ -323,8 +322,8 @@ keeps them outside the wrap so their specificity stays normal.
 
 ```ts
 // apps/catalog/src/main.tsx
+import "./fonts.css" // JetBrains Mono @font-face, files from @fontsource-variable/jetbrains-mono
 import "@tetherto/mdk-react-devkit/styles.css"
-import "@tetherto/mdk-fonts/jetbrains-mono.css"
 ```
 
 Always import the **compiled** `.css` file — the SCSS source is not

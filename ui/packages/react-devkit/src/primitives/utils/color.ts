@@ -24,6 +24,7 @@ export const hexToRgba = (hex: string, opacity: number = 1): string => {
   }
 
   if (!/^[0-9a-f]{6}$/i.test(sanitized)) {
+    // oxlint-disable-next-line no-console -- dev-facing warning; the input is returned unchanged
     console.warn(`hexToRgba: Invalid hex color "${hex}"`)
     return hex
   }

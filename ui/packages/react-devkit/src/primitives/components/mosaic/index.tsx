@@ -171,6 +171,7 @@ export const Mosaic = ({
     if (columnsStr) {
       const columnCount = columnsStr.trim().split(/\s+/).length
       if (columnCount !== colsCount) {
+        // oxlint-disable-next-line no-console -- dev-facing misconfiguration warning
         console.warn(
           `Mosaic: columns prop has ${columnCount} tracks but template has ${colsCount} columns`,
         )

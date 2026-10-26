@@ -272,6 +272,21 @@
       "rules": {
         "no-restricted-imports": "off"
       }
+    },
+    {
+      // Logging is the point in demo and tooling code: runnable examples log their
+      // callbacks (and ship to the docs site, where a disable comment would show),
+      // the catalog is a demo app, and scripts/tests report to the terminal.
+      "files": [
+        "**/*.example.tsx",
+        "apps/catalog/src/**",
+        "**/scripts/**",
+        "**/*.test.ts",
+        "**/*.test.tsx"
+      ],
+      "rules": {
+        "no-console": "off"
+      }
     }
   ]
 }

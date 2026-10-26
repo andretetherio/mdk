@@ -30,6 +30,7 @@
     "https://github.com/tetherto/mdk/releases/tag/v0.10.0",
     "https://github.com/tetherto/mdk/releases/tag/v0.11.0",
     "https://github.com/tetherto/mdk/releases/tag/v0.12.0",
+    "https://github.com/tetherto/mdk/releases/tag/v0.12.1",
     "backend/apps/?$",
     "backend/core/kernel/lib/modules/?$",
     "backend/core/kernel/lib/protocol/?$",

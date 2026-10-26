@@ -1,6 +1,6 @@
 {
   "name": "@tetherto/mdk-worker-satec",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "private": true,
   "description": "PowerMeter Satec",
   "keywords": [

@@ -88,7 +88,7 @@ repo. From this package after `npm run build`:
 
 ```bash
 mkdir -p /tmp/mdk-try && cd /tmp/mdk-try
-CLI=/path/to/mdk-prv/packages/cli/dist/index.js
+CLI=/path/to/mdk/packages/cli/dist/index.js
 
 # Install the MDK Developer Skill (via the @tetherto/mdk-skill entry point)
 node "$CLI" skill add --client all --dir .

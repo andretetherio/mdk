@@ -33,14 +33,10 @@ const formSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
   role: z.string().min(1, 'Please select a role'),
   bio: z.string().max(200, 'Bio must be under 200 characters').optional(),
-  notifications: z.boolean().default(false),
-  priority: z.enum(['low', 'medium', 'high'], {
-    required_error: 'Please select a priority level',
-  }),
-  startDate: z.date({ required_error: 'Please select a start date' }),
-  terms: z.literal(true, {
-    errorMap: () => ({ message: 'You must accept the terms' }),
-  }),
+  notifications: z.boolean(),
+  priority: z.enum(['low', 'medium', 'high'], { error: 'Please select a priority level' }),
+  startDate: z.date({ error: 'Please select a start date' }),
+  terms: z.literal(true, { error: 'You must accept the terms' }),
 })
 
 type FormValues = z.infer<typeof formSchema>

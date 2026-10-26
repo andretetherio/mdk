@@ -7,7 +7,7 @@ import { RouterProvider } from 'react-router'
 import { API_BASE_URL, APP_NAME, AUTH_BYPASS, OAUTH_BASE_URL } from './constants/env'
 import { permissionsFromToken } from './constants/permissions'
 import { router } from './router'
-import '@tetherto/mdk-fonts/jetbrains-mono.css'
+import './fonts.css'
 
 import '@tetherto/mdk-react-devkit/styles.css'
 import '@tetherto/mdk-react-devkit/styles-domain.css'

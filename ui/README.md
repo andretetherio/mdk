@@ -78,10 +78,6 @@ The React UI library:
 - [`src/domain/`](./packages/react-devkit/src/domain/): mining-domain components, with their constants, types and
   utils.
 
-### `@tetherto/mdk-fonts` ([`packages/fonts`](./packages/fonts/README.md))
-
-Font assets only (JetBrains Mono).
-
 ### Catalog app ([`apps/catalog`](./apps/catalog/README.md))
 
 Interactive showcase wrapped in `<MdkProvider>`. Runs via
@@ -164,12 +160,13 @@ runtime packages to its [`package.json`](./package.json):
 }
 ```
 
-> Runtime apps need only the three `@tetherto/mdk-*` packages above.
+> Runtime apps need only the three `@tetherto/mdk-*` packages above. Devkit's monospace text asks for JetBrains Mono and falls back to the
+> system monospace stack; to ship the font, add `@fontsource-variable/jetbrains-mono` and declare it the way
+> [`apps/catalog/src/fonts.css`](./apps/catalog/src/fonts.css) does.
 
 Wrap your app in `<MdkProvider>` and import the stylesheet once:
 
 ```tsx
-import "@tetherto/mdk-fonts/jetbrains-mono.css";
 import "@tetherto/mdk-react-devkit/styles.css";
 import "@tetherto/mdk-react-devkit/styles-domain.css"; // only if using domain (mining-domain) components
 import { MdkProvider } from "@tetherto/mdk-react-adapter";
