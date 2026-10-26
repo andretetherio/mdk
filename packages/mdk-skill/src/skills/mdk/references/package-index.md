@@ -45,7 +45,6 @@ Generated Worker docs: [`backend/workers/docs/supported-hardware.md`](../../../.
 | `@tetherto/mdk-react-devkit`  | [`ui/packages/react-devkit`](../../../../../../ui/packages/react-devkit/README.md)   | React component toolkit; components under [`src/primitives/components/`](../../../../../../ui/packages/react-devkit/src/primitives/components/) and [`src/domain/components/`](../../../../../../ui/packages/react-devkit/src/domain/components/index.ts) |
 | `@tetherto/mdk-react-adapter` | [`ui/packages/react-adapter`](../../../../../../ui/packages/react-adapter/README.md) | Hooks binding components to Worker/plugin data |
 | `@tetherto/mdk-ui-foundation` | [`ui/packages/ui-foundation`](../../../../../../ui/packages/ui-foundation/README.md) | Styling base                  |
-| `@tetherto/mdk-fonts`         | [`ui/packages/fonts`](../../../../../../ui/packages/fonts/README.md)                 | Font assets                   |
 
 ## Examples
 

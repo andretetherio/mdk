@@ -228,7 +228,6 @@ this document and the relevant `vitest.config.js`:
 | `@tetherto/mdk-ui-foundation` | 85% | 80% | Headless state + utilities, Node env. |
 | `@tetherto/mdk-react-adapter` | 80% | 80% | React bindings, `happy-dom` env. |
 | `@tetherto/mdk-react-devkit` | 80% | 80% | UI library, three Vitest projects (`node`, `primitives-dom`, `domain-dom`). |
-| `@tetherto/mdk-fonts` | — | — | Asset-only; no tests, no coverage. |
 
 **Exclusions** — common to all: barrel `index.{ts,tsx}` files, `*.d.ts`, and
 test files / test utilities. Additionally: `src/types/**` (ui-foundation);

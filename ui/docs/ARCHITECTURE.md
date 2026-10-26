@@ -18,7 +18,7 @@ set of npm workspace packages that consuming applications depend on.
 
 The UI toolkit is split along a **framework-first** axis: a framework-agnostic
 headless core, a per-framework adapter, and a per-framework UI library on
-top. `@tetherto/mdk-fonts` ships font assets independently.
+top.
 
 ### `@tetherto/mdk-ui-foundation` — framework-agnostic core
 
@@ -82,9 +82,9 @@ The app runtime chain is **headless → React adapter → React devkit → catal
         │ • dist/registry.json                            │
         └─────────────────┬───────────────────────────────┘
                           │
-        ┌─────────────────▼────────────┐    ┌────────────────────────┐
-        │ @tetherto/mdk-catalog-ui        │    │ @tetherto/mdk-fonts    │
-        │ (apps/catalog)                  │    └────────────────────────┘
+        ┌─────────────────▼────────────┐
+        │ @tetherto/mdk-catalog-ui        │
+        │ (apps/catalog)                  │
         └──────────────────────────────┘
 ```
 
@@ -98,7 +98,6 @@ mdk-ui/
 │   ├── ui-foundation/          # @tetherto/mdk-ui-foundation        — headless state + telemetry
 │   ├── react-adapter/    # @tetherto/mdk-react-adapter  — React bindings for the core
 │   ├── react-devkit/     # @tetherto/mdk-react-devkit   — React UI (primitives + domain)
-│   └── fonts/            # @tetherto/mdk-fonts            — JetBrains Mono assets
 ├── apps/
 │   └── catalog/          # @tetherto/mdk-catalog-ui          — Vite/React showcase
 ├── api-surface/          # Committed export-shape baselines (check:api-surface)
@@ -279,20 +278,6 @@ half is a stack concern; see
 [`packages/ui-agent/README.md`](../packages/ui-agent/README.md) for the whole
 chain from an empty machine.
 
-### `@tetherto/mdk-fonts`
-
-**Purpose**: Font assets for the toolkit.
-
-**Location**: [`packages/fonts`](../packages/fonts/README.md)
-
-**Exports**: JetBrains Mono `@font-face` declarations and files.
-
-**Usage**:
-
-```tsx
-import "@tetherto/mdk-fonts/jetbrains-mono.css";
-```
-
 ## Build strategy
 
 | Package | TS output (consumed) | CSS / JSON artifacts |
@@ -300,7 +285,6 @@ import "@tetherto/mdk-fonts/jetbrains-mono.css";
 | `@tetherto/mdk-ui-foundation` | pre-built `dist/` ESM + `.d.ts` | `dist/stores.json` |
 | `@tetherto/mdk-react-adapter` | pre-built `dist/` ESM + `.d.ts` | `dist/hooks.json` |
 | `@tetherto/mdk-react-devkit` | pre-built `dist/` ESM + `.d.ts` | `dist/styles.css`, `dist/styles-domain.css`, `dist/registry.json` |
-| `@tetherto/mdk-fonts` | n/a | `dist/jetbrains-mono.css` + woff2 |
 
 Every TypeScript library package is **pre-built** — consumers import `dist/`
 via `exports`, not source. Tasks run through Turborepo for ordering and

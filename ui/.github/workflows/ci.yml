@@ -266,7 +266,7 @@ jobs:
         if: matrix.shard == 1
         run: |
           echo "🧪 Running ui-foundation, react-adapter tests with coverage..."
-          time npx turbo run test:coverage --filter='!@tetherto/mdk-react-devkit' --filter='!@tetherto/mdk-fonts' --filter='!@tetherto/mdk-catalog-ui'
+          time npx turbo run test:coverage --filter='!@tetherto/mdk-react-devkit' --filter='!@tetherto/mdk-catalog-ui'
 
       - name: 🧪 Run react-devkit shard ${{ matrix.shard }}/4
         working-directory: packages/react-devkit

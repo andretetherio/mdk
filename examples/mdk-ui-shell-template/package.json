@@ -1,7 +1,7 @@
 {
   "name": "@tetherto/mdk-ui-shell-template",
   "type": "module",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "private": true,
   "scripts": {
     "dev": "vite",
@@ -12,8 +12,8 @@
     "lint:fix": "oxlint --type-aware --fix"
   },
   "dependencies": {
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
     "@tanstack/react-query": "^5.59.0",
-    "@tetherto/mdk-fonts": "file:../../ui/packages/fonts",
     "@tetherto/mdk-react-adapter": "file:../../ui/packages/react-adapter",
     "@tetherto/mdk-react-devkit": "file:../../ui/packages/react-devkit",
     "@tetherto/mdk-ui-agent": "file:../../ui/packages/ui-agent",

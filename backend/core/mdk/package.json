@@ -1,6 +1,6 @@
 {
   "name": "@tetherto/mdk-core",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "description": "MDK bootstrap utilities and worker-infra services — kernel/gateway lifecycle plus injectable log/comment/alert/stats/settings/provisioning services for runtime-hosted workers",
   "main": "index.js",
   "keywords": [
@@ -21,8 +21,8 @@
     "test:coverage": "NODE_ENV=test brittle --coverage 'tests/**/*.test.js'"
   },
   "dependencies": {
-    "@tetherto/mdk-gateway": "^0.12.0",
-    "@tetherto/mdk-kernel": "^0.12.0",
+    "@tetherto/mdk-gateway": "^0.12.1",
+    "@tetherto/mdk-kernel": "^0.12.1",
     "@bitfinex/bfx-facs-http": "^1.1.3",
     "@bitfinex/bfx-facs-interval": "^1.0.0",
     "@bitfinex/bfx-facs-scheduler": "^1.0.0",

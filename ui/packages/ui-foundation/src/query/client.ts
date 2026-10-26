@@ -66,6 +66,7 @@ let deprecationWarned = false
 const warnDeprecatedEnv = (name: string): void => {
   if (deprecationWarned) return
   deprecationWarned = true
+  // oxlint-disable-next-line no-console -- deprecation notice for the host developer, once per process
   console.warn(
     `[mdk] ${name} is deprecated and will stop being read in the next major. `
     + `Rename it to ${name.startsWith('VITE_') ? API_BASE_URL_ENV.vite : API_BASE_URL_ENV.node}.`,

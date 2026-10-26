@@ -79,7 +79,6 @@ const formatSize = (bytes) => {
  *                     a production browser bundle; excluded from the size verdict.
  */
 const CATEGORY = {
-  'packages/fonts': 'bundle',
   'packages/react-devkit': 'treeshake',
   'packages/react-adapter': 'treeshake',
   'packages/ui-foundation': 'treeshake',

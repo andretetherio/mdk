@@ -26,6 +26,7 @@ export const useSidebarExpandedState = (
         return state.expanded
       }
     } catch (error) {
+      // oxlint-disable-next-line no-console -- storage failure is non-fatal; surface it without throwing
       console.warn('Failed to load sidebar state from localStorage:', error)
     }
     return defaultExpanded
@@ -36,6 +37,7 @@ export const useSidebarExpandedState = (
     try {
       localStorage.setItem(SIDEBAR_STORAGE_KEY, JSON.stringify({ expanded: newExpanded }))
     } catch (error) {
+      // oxlint-disable-next-line no-console -- storage failure is non-fatal; surface it without throwing
       console.warn('Failed to save sidebar state to localStorage:', error)
     }
   }, [])
@@ -61,6 +63,7 @@ export const useSidebarSectionState = (
         return states[sectionId] ?? defaultOpen
       }
     } catch (error) {
+      // oxlint-disable-next-line no-console -- storage failure is non-fatal; surface it without throwing
       console.warn('Failed to load section states from localStorage:', error)
     }
     return defaultOpen
@@ -75,6 +78,7 @@ export const useSidebarSectionState = (
         states[sectionId] = newOpen
         localStorage.setItem(SECTION_STORAGE_KEY, JSON.stringify(states))
       } catch (error) {
+        // oxlint-disable-next-line no-console -- storage failure is non-fatal; surface it without throwing
         console.warn('Failed to save section state to localStorage:', error)
       }
     },
@@ -92,6 +96,7 @@ export const clearSidebarState = (): void => {
     localStorage.removeItem(SIDEBAR_STORAGE_KEY)
     localStorage.removeItem(SECTION_STORAGE_KEY)
   } catch (error) {
+    // oxlint-disable-next-line no-console -- storage failure is non-fatal; surface it without throwing
     console.warn('Failed to clear sidebar state from localStorage:', error)
   }
 }

@@ -161,7 +161,12 @@ export const validators = {
    * Number within a range
    */
   number: (options?: { min?: number; max?: number; message?: string }) => {
-    let schema = z.number(options?.message ? { invalid_type_error: options.message } : undefined)
+    // A wrong type gets the custom message; a missing value keeps Zod's default.
+    let schema = z.number(
+      options?.message
+        ? { error: (issue) => (issue.input === undefined ? undefined : options.message) }
+        : undefined,
+    )
 
     if (options?.min !== undefined) {
       schema = schema.min(options.min, `Value must be at least ${options.min}`)
@@ -178,16 +183,16 @@ export const validators = {
    * Boolean with required true (e.g., for terms acceptance)
    */
   requiredBoolean: (message = 'This field is required') =>
-    z.literal(true, {
-      errorMap: () => ({ message }),
-    }),
+    z.literal(true, { error: message }),
 
   /**
    * Date validation
    */
   date: (options?: { min?: Date; max?: Date; required?: boolean }) => {
     let schema = z.date(
-      options?.required === false ? undefined : { required_error: 'Please select a date' },
+      options?.required === false
+        ? undefined
+        : { error: (issue) => (issue.input === undefined ? 'Please select a date' : undefined) },
     )
 
     if (options?.min) {
@@ -205,7 +210,7 @@ export const validators = {
    * Enum validation with custom error
    */
   enum: <T extends [string, ...string[]]>(values: T, message = 'Please select a valid option') =>
-    z.enum(values, { required_error: message }),
+    z.enum(values, { error: (issue) => (issue.input === undefined ? message : undefined) }),
 
   /**
    * MAC address validation

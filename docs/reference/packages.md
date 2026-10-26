@@ -76,11 +76,10 @@ Availability says how you get a package:
 
 | Package | Purpose | Availability |
 | --- | --- | --- |
-| [`@tetherto/mdk-fonts`][mdk-fonts] | Font assets for MDK | `publishable` |
-| [`@tetherto/mdk-react-adapter`][mdk-react-adapter] | React framework adapter for @tetherto/mdk-ui-foundation. Binds Zustand vanilla stores and TanStack QueryClient to React-native hooks. No Redux | `publishable` |
-| [`@tetherto/mdk-react-devkit`][mdk-react-devkit] | MDK Devkit (React) — generic UI primitives (src/primitives) plus mining-domain components, hooks, and state bindings (src/domain) | `publishable` |
-| [`@tetherto/mdk-ui-agent`][mdk-ui-agent] | Injectable operator Co-pilot chat UI for the MDK agent gateway plugin. Streams the six-event agent contract over SSE and renders it as a docked panel or a full-page route | `publishable` |
-| [`@tetherto/mdk-ui-foundation`][mdk-ui-foundation] | Framework-agnostic headless foundation for the MDK Devkit. Currently exposes Zustand vanilla stores and a TanStack QueryClient factory. No React | `publishable` |
+| [`@tetherto/mdk-react-adapter`][mdk-react-adapter] | React framework adapter for @tetherto/mdk-ui-foundation. Binds Zustand vanilla stores and TanStack QueryClient to React-native hooks. No Redux | `workspace` |
+| [`@tetherto/mdk-react-devkit`][mdk-react-devkit] | MDK Devkit (React) — generic UI primitives (src/primitives) plus mining-domain components, hooks, and state bindings (src/domain) | `workspace` |
+| [`@tetherto/mdk-ui-agent`][mdk-ui-agent] | Injectable operator Co-pilot chat UI for the MDK agent gateway plugin. Streams the six-event agent contract over SSE and renders it as a docked panel or a full-page route | `workspace` |
+| [`@tetherto/mdk-ui-foundation`][mdk-ui-foundation] | Framework-agnostic headless foundation for the MDK Devkit. Currently exposes Zustand vanilla stores and a TanStack QueryClient factory. No React | `workspace` |
 
 ## Tools
 
@@ -158,9 +157,6 @@ Availability says how you get a package:
 
 [mdk-worker-mock]: ../../backend/workers/mock/README.md
 <!-- docs@tether.io: mdk-worker-mock → https://github.com/tetherto/mdk/blob/main/backend/workers/mock/README.md -->
-
-[mdk-fonts]: ../../ui/packages/fonts/README.md
-<!-- docs@tether.io: mdk-fonts → https://github.com/tetherto/mdk/blob/main/ui/packages/fonts/README.md -->
 
 [mdk-react-adapter]: ../../ui/packages/react-adapter/README.md
 <!-- docs@tether.io: mdk-react-adapter → https://github.com/tetherto/mdk/blob/main/ui/packages/react-adapter/README.md -->

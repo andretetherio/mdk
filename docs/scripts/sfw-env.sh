@@ -31,7 +31,7 @@
 #   qvac.tether.io               QVAC product page, linked from docs/guides/agent/run-standalone.md
 #
 # Source this file from your shell profile rather than duplicating the policy there:
-#   [ -f "/absolute/path/to/mdk-prv/scripts/sfw-env.sh" ] && source "/absolute/path/to/mdk-prv/scripts/sfw-env.sh"
+#   [ -f "/absolute/path/to/mdk/scripts/sfw-env.sh" ] && source "/absolute/path/to/mdk/scripts/sfw-env.sh"
 
 # Merge additively: if another repo's sfw-env.sh already set SFW_CUSTOM_REGISTRIES
 # in this shell, keep its entries rather than clobbering them.

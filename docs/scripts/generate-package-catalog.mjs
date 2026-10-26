@@ -164,10 +164,9 @@ ${links.join('\n\n')}
 }
 
 function main () {
-  // Tracked plus untracked-but-not-ignored, minus anything deleted from the working tree.
-  const manifests = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '--', ...MANIFESTS], { cwd: REPO_ROOT, encoding: 'utf8' })
+  const manifests = execFileSync('git', ['ls-files', '--', ...MANIFESTS], { cwd: REPO_ROOT, encoding: 'utf8' })
     .split('\n')
-    .filter((file) => file && fs.existsSync(path.join(REPO_ROOT, file)))
+    .filter(Boolean)
   const { entries, errors } = buildCatalog(REPO_ROOT, manifests)
 
   if (errors.length) {

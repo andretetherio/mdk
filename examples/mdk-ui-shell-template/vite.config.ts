@@ -18,8 +18,7 @@ const devkitRoot = dirname(_require.resolve('@tetherto/mdk-react-devkit/package.
 // This app root, plus the directory holding the MDK packages. When the MDK
 // deps are `file:`-linked (running this template in place, or a copy scaffolded
 // into the monorepo's apps/) they resolve to `…/ui/packages/*`, outside this
-// app — so Vite's dev server must be allowed to serve their built assets (e.g.
-// the mdk-fonts .woff2 files referenced from devkit CSS). For a standalone app
+// app — so Vite's dev server must be allowed to serve their built assets. For a standalone app
 // the packages live under the app's own node_modules and this is a harmless no-op.
 const appRoot = dirname(fileURLToPath(import.meta.url))
 const mdkPackagesRoot = dirname(devkitRoot)
